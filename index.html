@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loopy</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <!-- Banner Section - Full Screen -->
+    <section class="banner">
+        <div class="banner-content">
+            <h1>Welcome to Loopy</h1>
+            <p>Experience the future of web design</p>
+            <button class="cta-button">Get Started</button>
+        </div>
+    </section>
+
+    <!-- Horizontal Scrolling Sections -->
+    <!-- Section 2 -->
+    <section class="horizontal-section section-1 uc-rightscroll">
+        <div class="section-content">
+            <h2>About Us</h2>
+            <p>We create innovative digital experiences that push the boundaries of what's possible in web design and user interaction.</p>
+            <div class="features">
+                <div class="feature">
+                    <h3>Innovation</h3>
+                    <p>Cutting-edge solutions for modern problems</p>
+                </div>
+                <div class="feature">
+                    <h3>Design</h3>
+                    <p>Beautiful, functional, and user-centered design</p>
+                </div>
+                <div class="feature">
+                    <h3>Technology</h3>
+                    <p>Latest technologies and best practices</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3 -->
+    <section class="horizontal-section section-2 uc-rightscroll">
+        <div class="section-content">
+            <h2>Our Services</h2>
+            <p>Comprehensive digital solutions tailored to your needs</p>
+            <div class="services">
+                <div class="service">
+                    <h3>Web Development</h3>
+                    <p>Custom websites and web applications built with modern technologies</p>
+                </div>
+                <div class="service">
+                    <h3>UI/UX Design</h3>
+                    <p>User-centered design that creates exceptional experiences</p>
+                </div>
+                <div class="service">
+                    <h3>Consulting</h3>
+                    <p>Strategic guidance for your digital transformation journey</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final Section - Vertical Scroll Down -->
+    <section class="final-section">
+        <div class="section-content">
+            <h2>Contact Us</h2>
+            <p>Ready to start your next project? Let's talk about how we can help you achieve your goals.</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <h3>Email</h3>
+                    <p>hello@loopy.com</p>
+                </div>
+                <div class="contact-item">
+                    <h3>Phone</h3>
+                    <p>+1 (555) 123-4567</p>
+                </div>
+                <div class="contact-item">
+                    <h3>Address</h3>
+                    <p>123 Innovation Street, Tech City, TC 12345</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Loopy. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ScrollMagic and GSAP Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/ScrollMagic.min.js" integrity="sha512-8E3KZoPoZCD+1dgfqhPbejQBnQfBXe8FuwL4z/c8sTrgeDMFEnoyTlH3obB4/fV+6Sg0a0XF+L/6xS4Xx1fUEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js" integrity="sha512-gmwBmiTVER57N3jYS3LinA9eb8aHrJua5iQD7yqYCKa5x6Jjc7VDVaEA0je0Lu0bP9j7tEjV3+1qUm6loO99Kw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/plugins/animation.gsap.min.js" integrity="sha512-5/OHwmQzDSBS0Ous4/hlYoWLHd06/d2r7LdKZQVBXOA6PvOqWVXtdboiLTU7lQTGyVoKVTNkwi0ol4gHGlw5ww==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <script>
+        // Initialize ScrollMagic horizontal scrolling
+        initMagicScroll();
+        
+        function initMagicScroll() {
+            const groups = [];
+            $('.uc-rightscroll, .uc-leftscroll').each(function() {
+                if ($(this).prev().hasClass('uc-rightscroll') && $(this).hasClass('uc-rightscroll')) {
+                    groups[groups.length - 1].$els = groups.at(-1).$els.add($(this));
+                    return;
+                }
+
+                 if ($(this).prev().hasClass('uc-leftscroll') && $(this).hasClass('uc-leftscroll')) {
+                    groups[groups.length - 1].$els = groups.at(-1).$els.add($(this));
+                    return;
+                }
+        
+                groups.push({
+                    $els: $(this),
+                    options: {
+                        dir: $(this).hasClass('uc-leftscroll') ? 'left' : 'right'
+                    }
+                });
+            });
+        
+            const map = {};
+            for (let group of groups) {
+                const id = 'uc' + Date.now();
+                map[id] = group;
+                const extraStyle = group.options.dir === 'right' ? `left: -${group.$els.length - 1}00vw; flex-direction: row-reverse;` : '';
+                group
+                    .$els
+                    .css({
+                        flex: '0 0 100vw',
+                    })
+                    .wrapAll(`<div id="pin-${id}" style="overflow: hidden; width: 100vw; height: 100vh;"><div id="${id}" style="display: flex; width: ${group.$els.length}00vw; height: 100%; position: relative; ${extraStyle}"></div></div>`);
+            }
+        
+            const controller = new ScrollMagic.Controller();
+        
+            for (let id in map) {
+                const delta = 100 - 100 / map[id].$els.length;
+                const sign = (map[id].options.dir === 'left') ? '-' : '';
+                const animation = gsap.to(`#${id}`, {
+                    duration: 1,
+                    x: `${sign}${delta}%`,
+                    ease: "none"
+                });
+
+                new ScrollMagic.Scene({
+                    triggerElement: `#pin-${id}`,
+                    triggerHook: "onLeave",
+                    duration: `${map[id].$els.length}00%`
+                })
+                .setPin(`#pin-${id}`)
+                .setTween(animation)
+                .addTo(controller);    
+            }    
+        }
+    </script>
+</body>
+</html>
