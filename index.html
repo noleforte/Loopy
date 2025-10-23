@@ -117,57 +117,63 @@
         // GSAP Square Navigation System
         let currentSection = 0;
         const sections = ['banner', 'section1', 'section2', 'contact'];
+        const directions = [
+            { x: 100, y: 0 },   // banner -> section1 (right)
+            { x: 0, y: 100 },   // section1 -> section2 (down)
+            { x: -100, y: 0 },  // section2 -> contact (left)
+            { x: 0, y: -100 }   // contact -> banner (up)
+        ];
         let isAnimating = false;
 
-        // Initialize GSAP timeline and setup - Square layout
-        gsap.set("#main-container", { position: "relative" });
-        gsap.set("#banner", { x: 0, y: 0 });           // Top-left
-        gsap.set("#section1", { x: "100vw", y: 0 });    // Top-right  
-        gsap.set("#section2", { x: 0, y: "100vh" });    // Bottom-left
-        gsap.set("#contact", { x: "-100vw", y: "100vh" }); // Bottom-left (слева от section2)
+        const unitValue = (value, unit) => (value === 0 ? 0 : `${value}${unit}`);
+
+        function positionSections(centerIndex) {
+            let offsetX = 0;
+            let offsetY = 0;
+
+            const currentId = sections[centerIndex];
+            gsap.set(`#${currentId}`, { x: 0, y: 0 });
+
+            for (let step = 1; step < sections.length; step++) {
+                const directionIndex = (centerIndex + step - 1 + directions.length) % directions.length;
+                offsetX += directions[directionIndex].x;
+                offsetY += directions[directionIndex].y;
+                const targetId = sections[(centerIndex + step) % sections.length];
+                gsap.set(`#${targetId}`, {
+                    x: unitValue(offsetX, 'vw'),
+                    y: unitValue(offsetY, 'vh')
+                });
+            }
+        }
 
         // Navigation function
         function nextSection() {
             if (isAnimating) return;
             isAnimating = true;
 
-            const current = sections[currentSection];
-            const next = sections[(currentSection + 1) % sections.length];
-            
-            let animation;
-            
-            switch(currentSection) {
-                case 0: // banner → section1 (вправо)
-                    animation = gsap.timeline()
-                        .to("#banner", { x: "-100vw", duration: 1, ease: "power2.inOut" })
-                        .to("#section1", { x: 0, duration: 1, ease: "power2.inOut" }, 0);
-                    break;
-                    
-                case 1: // section1 → section2 (вниз)
-                    animation = gsap.timeline()
-                        .to("#section1", { y: "-100vh", duration: 1, ease: "power2.inOut" })
-                        .to("#section2", { y: 0, duration: 1, ease: "power2.inOut" }, 0);
-                    break;
-                    
-                case 2: // section2 → contact (влево) - исправляем белый экран
-                    animation = gsap.timeline()
-                        .to("#section2", { x: "-100vw", duration: 1, ease: "power2.inOut" })
-                        .to("#contact", { x: 0, duration: 1, ease: "power2.inOut" }, 0);
-                    break;
-                    
-                case 3: // contact → banner (вверх, banner сверху)
-                    animation = gsap.timeline()
-                        .to("#contact", { y: "-100vh", duration: 1, ease: "power2.inOut" })
-                        .to("#banner", { y: 0, duration: 1, ease: "power2.inOut" }, 0);
-                    break;
-            }
+            const nextIndex = (currentSection + 1) % sections.length;
+            const direction = directions[currentSection];
+            const currentSelector = `#${sections[currentSection]}`;
+            const nextSelector = `#${sections[nextIndex]}`;
 
-            animation.eventCallback("onComplete", () => {
-                // Reset positions for next cycle
-                resetSectionPositions();
-                currentSection = (currentSection + 1) % sections.length;
-                isAnimating = false;
+            const animation = gsap.timeline({
+                onComplete: () => {
+                    currentSection = nextIndex;
+                    positionSections(currentSection);
+                    isAnimating = false;
+                    updateProgressIndicator();
+                }
             });
+
+            if (direction.x !== 0) {
+                animation
+                    .to(currentSelector, { x: unitValue(-Math.sign(direction.x) * 100, 'vw'), duration: 1, ease: "power2.inOut" })
+                    .to(nextSelector, { x: 0, duration: 1, ease: "power2.inOut" }, 0);
+            } else {
+                animation
+                    .to(currentSelector, { y: unitValue(-Math.sign(direction.y) * 100, 'vh'), duration: 1, ease: "power2.inOut" })
+                    .to(nextSelector, { y: 0, duration: 1, ease: "power2.inOut" }, 0);
+            }
         }
 
         // Previous section function
@@ -175,106 +181,30 @@
             if (isAnimating) return;
             isAnimating = true;
 
-            const current = sections[currentSection];
-            const prev = sections[(currentSection - 1 + sections.length) % sections.length];
-            
-            let animation;
-            
-            switch(currentSection) {
-                case 0: // banner ← contact (вниз)
-                    animation = gsap.timeline()
-                        .to("#banner", { y: "100vh", duration: 1, ease: "power2.inOut" })
-                        .to("#contact", { y: 0, duration: 1, ease: "power2.inOut" }, 0);
-                    break;
-                    
-                case 1: // section1 ← banner (влево)
-                    animation = gsap.timeline()
-                        .to("#section1", { x: "100vw", duration: 1, ease: "power2.inOut" })
-                        .to("#banner", { x: 0, duration: 1, ease: "power2.inOut" }, 0);
-                    break;
-                    
-                case 2: // section2 ← section1 (вверх)
-                    animation = gsap.timeline()
-                        .to("#section2", { y: "100vh", duration: 1, ease: "power2.inOut" })
-                        .to("#section1", { y: 0, duration: 1, ease: "power2.inOut" }, 0);
-                    break;
-                    
-                case 3: // contact ← section2 (вправо)
-                    animation = gsap.timeline()
-                        .to("#contact", { x: "-100vw", duration: 1, ease: "power2.inOut" })
-                        .to("#section2", { x: 0, duration: 1, ease: "power2.inOut" }, 0);
-                    break;
-            }
+            const previousIndex = (currentSection - 1 + sections.length) % sections.length;
+            const direction = directions[previousIndex];
+            const deltaX = -direction.x;
+            const deltaY = -direction.y;
+            const currentSelector = `#${sections[currentSection]}`;
+            const previousSelector = `#${sections[previousIndex]}`;
 
-            animation.eventCallback("onComplete", () => {
-                // Reset positions for next cycle
-                resetPreviousSectionPositions();
-                currentSection = (currentSection - 1 + sections.length) % sections.length;
-                isAnimating = false;
+            const animation = gsap.timeline({
+                onComplete: () => {
+                    currentSection = previousIndex;
+                    positionSections(currentSection);
+                    isAnimating = false;
+                    updateProgressIndicator();
+                }
             });
-        }
 
-        // Reset section positions for previous navigation
-        function resetPreviousSectionPositions() {
-            const prevSection = (currentSection - 1 + sections.length) % sections.length;
-            
-            switch(prevSection) {
-                case 0: // banner (top-left)
-                    gsap.set("#banner", { x: 0, y: 0 });
-                    gsap.set("#section1", { x: "100vw", y: 0 });
-                    gsap.set("#section2", { x: 0, y: "100vh" });
-                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
-                    break;
-                case 1: // section1 (top-right)
-                    gsap.set("#banner", { x: "-100vw", y: 0 });
-                    gsap.set("#section1", { x: 0, y: 0 });
-                    gsap.set("#section2", { x: 0, y: "100vh" });
-                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
-                    break;
-                case 2: // section2 (bottom-left)
-                    gsap.set("#banner", { x: "-100vw", y: 0 });
-                    gsap.set("#section1", { x: 0, y: "-100vh" });
-                    gsap.set("#section2", { x: 0, y: 0 });
-                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
-                    break;
-                case 3: // contact (bottom-left)
-                    gsap.set("#banner", { x: "-100vw", y: 0 });
-                    gsap.set("#section1", { x: 0, y: "-100vh" });
-                    gsap.set("#section2", { x: "100vw", y: 0 });
-                    gsap.set("#contact", { x: 0, y: 0 });
-                    break;
-            }
-        }
-
-        // Reset section positions for next cycle
-        function resetSectionPositions() {
-            const nextSection = (currentSection + 1) % sections.length;
-            
-            switch(nextSection) {
-                case 0: // banner (top-left)
-                    gsap.set("#banner", { x: 0, y: 0 });
-                    gsap.set("#section1", { x: "100vw", y: 0 });
-                    gsap.set("#section2", { x: 0, y: "100vh" });
-                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
-                    break;
-                case 1: // section1 (top-right)
-                    gsap.set("#banner", { x: "-100vw", y: 0 });
-                    gsap.set("#section1", { x: 0, y: 0 });
-                    gsap.set("#section2", { x: 0, y: "100vh" });
-                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
-                    break;
-                case 2: // section2 (bottom-left)
-                    gsap.set("#banner", { x: "-100vw", y: 0 });
-                    gsap.set("#section1", { x: 0, y: "-100vh" });
-                    gsap.set("#section2", { x: 0, y: 0 });
-                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
-                    break;
-                case 3: // contact (bottom-left)
-                    gsap.set("#banner", { x: "-100vw", y: 0 });
-                    gsap.set("#section1", { x: 0, y: "-100vh" });
-                    gsap.set("#section2", { x: "100vw", y: 0 });
-                    gsap.set("#contact", { x: 0, y: 0 });
-                    break;
+            if (deltaX !== 0) {
+                animation
+                    .to(currentSelector, { x: unitValue(-Math.sign(deltaX) * 100, 'vw'), duration: 1, ease: "power2.inOut" })
+                    .to(previousSelector, { x: 0, duration: 1, ease: "power2.inOut" }, 0);
+            } else {
+                animation
+                    .to(currentSelector, { y: unitValue(-Math.sign(deltaY) * 100, 'vh'), duration: 1, ease: "power2.inOut" })
+                    .to(previousSelector, { y: 0, duration: 1, ease: "power2.inOut" }, 0);
             }
         }
 
@@ -296,11 +226,9 @@
             if (e.deltaY > 0) {
                 // Scroll down - next section
                 nextSection();
-                updateProgressIndicator();
             } else if (e.deltaY < 0) {
                 // Scroll up - previous section
                 previousSection();
-                updateProgressIndicator();
             }
         });
 
@@ -310,13 +238,11 @@
                 e.preventDefault();
                 if (!isAnimating) {
                     nextSection();
-                    updateProgressIndicator();
                 }
             } else if (e.key === 'ArrowLeft') {
                 e.preventDefault();
                 if (!isAnimating) {
                     previousSection();
-                    updateProgressIndicator();
                 }
             }
         });
@@ -344,7 +270,6 @@
                         setTimeout(() => {
                             if (!isAnimating) {
                                 nextSection();
-                                updateProgressIndicator();
                             }
                         }, i * 200);
                     }
@@ -354,7 +279,6 @@
                         setTimeout(() => {
                             if (!isAnimating) {
                                 previousSection();
-                                updateProgressIndicator();
                             }
                         }, i * 200);
                     }
@@ -362,7 +286,8 @@
             });
         });
 
-        // Initialize progress indicator
+        // Initialize layout and progress indicator
+        positionSections(currentSection);
         updateProgressIndicator();
 
 
