@@ -9,18 +9,27 @@
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
 <body>
+     <!-- Progress Indicator -->
+     <div id="progress-indicator">
+         <div class="progress-dot active" data-section="0"></div>
+         <div class="progress-dot" data-section="1"></div>
+         <div class="progress-dot" data-section="2"></div>
+         <div class="progress-dot" data-section="3"></div>
+     </div>
+
+     <!-- Main Container for GSAP Animations -->
+     <div id="main-container">
     <!-- Banner Section - Full Screen -->
-    <section class="banner">
+         <section id="banner" class="banner">
         <div class="banner-content">
             <h1>Welcome to Loopy</h1>
             <p>Experience the future of web design</p>
-            <button class="cta-button">Get Started</button>
+                 <button class="cta-button" onclick="nextSection()">Get Started</button>
         </div>
     </section>
 
-    <!-- Horizontal Scrolling Sections -->
-    <!-- Section 2 -->
-    <section class="horizontal-section section-1 uc-rightscroll">
+         <!-- Section 1 - About Us -->
+         <section id="section1" class="horizontal-section section-1">
         <div class="section-content">
             <h2>About Us</h2>
             <p>We create innovative digital experiences that push the boundaries of what's possible in web design and user interaction.</p>
@@ -38,11 +47,12 @@
                     <p>Latest technologies and best practices</p>
                 </div>
             </div>
+            <button class="nav-button" onclick="nextSection()">Continue</button>
         </div>
     </section>
 
-    <!-- Section 3 -->
-    <section class="horizontal-section section-2 uc-rightscroll">
+         <!-- Section 2 - Services -->
+         <section id="section2" class="horizontal-section section-2">
         <div class="section-content">
             <h2>Our Services</h2>
             <p>Comprehensive digital solutions tailored to your needs</p>
@@ -60,11 +70,12 @@
                     <p>Strategic guidance for your digital transformation journey</p>
                 </div>
             </div>
+            <button class="nav-button" onclick="nextSection()">Continue</button>
         </div>
     </section>
 
-    <!-- Final Section - Vertical Scroll Down -->
-    <section class="final-section">
+         <!-- Final Section - Contact -->
+         <section id="contact" class="final-section">
         <div class="section-content">
             <h2>Contact Us</h2>
             <p>Ready to start your next project? Let's talk about how we can help you achieve your goals.</p>
@@ -82,8 +93,10 @@
                     <p>123 Innovation Street, Tech City, TC 12345</p>
                 </div>
             </div>
+            <button class="nav-button" onclick="nextSection()">Back to Start</button>
         </div>
     </section>
+     </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -97,70 +110,262 @@
         </div>
     </footer>
 
-    <!-- ScrollMagic and GSAP Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/ScrollMagic.min.js" integrity="sha512-8E3KZoPoZCD+1dgfqhPbejQBnQfBXe8FuwL4z/c8sTrgeDMFEnoyTlH3obB4/fV+6Sg0a0XF+L/6xS4Xx1fUEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+     <!-- GSAP Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js" integrity="sha512-gmwBmiTVER57N3jYS3LinA9eb8aHrJua5iQD7yqYCKa5x6Jjc7VDVaEA0je0Lu0bP9j7tEjV3+1qUm6loO99Kw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/plugins/animation.gsap.min.js" integrity="sha512-5/OHwmQzDSBS0Ous4/hlYoWLHd06/d2r7LdKZQVBXOA6PvOqWVXtdboiLTU7lQTGyVoKVTNkwi0ol4gHGlw5ww==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
     <script>
-        // Initialize ScrollMagic horizontal scrolling
-        initMagicScroll();
-        
-        function initMagicScroll() {
-            const groups = [];
-            $('.uc-rightscroll, .uc-leftscroll').each(function() {
-                if ($(this).prev().hasClass('uc-rightscroll') && $(this).hasClass('uc-rightscroll')) {
-                    groups[groups.length - 1].$els = groups.at(-1).$els.add($(this));
-                    return;
-                }
+        // GSAP Square Navigation System
+        let currentSection = 0;
+        const sections = ['banner', 'section1', 'section2', 'contact'];
+        let isAnimating = false;
 
-                 if ($(this).prev().hasClass('uc-leftscroll') && $(this).hasClass('uc-leftscroll')) {
-                    groups[groups.length - 1].$els = groups.at(-1).$els.add($(this));
-                    return;
-                }
-        
-                groups.push({
-                    $els: $(this),
-                    options: {
-                        dir: $(this).hasClass('uc-leftscroll') ? 'left' : 'right'
-                    }
-                });
-            });
-        
-            const map = {};
-            for (let group of groups) {
-                const id = 'uc' + Date.now();
-                map[id] = group;
-                const extraStyle = group.options.dir === 'right' ? `left: -${group.$els.length - 1}00vw; flex-direction: row-reverse;` : '';
-                group
-                    .$els
-                    .css({
-                        flex: '0 0 100vw',
-                    })
-                    .wrapAll(`<div id="pin-${id}" style="overflow: hidden; width: 100vw; height: 100vh;"><div id="${id}" style="display: flex; width: ${group.$els.length}00vw; height: 100%; position: relative; ${extraStyle}"></div></div>`);
+        // Initialize GSAP timeline and setup - Square layout
+        gsap.set("#main-container", { position: "relative" });
+        gsap.set("#banner", { x: 0, y: 0 });           // Top-left
+        gsap.set("#section1", { x: "100vw", y: 0 });    // Top-right  
+        gsap.set("#section2", { x: 0, y: "100vh" });    // Bottom-left
+        gsap.set("#contact", { x: "-100vw", y: "100vh" }); // Bottom-left (слева от section2)
+
+        // Navigation function
+        function nextSection() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const current = sections[currentSection];
+            const next = sections[(currentSection + 1) % sections.length];
+            
+            let animation;
+            
+            switch(currentSection) {
+                case 0: // banner → section1 (вправо)
+                    animation = gsap.timeline()
+                        .to("#banner", { x: "-100vw", duration: 1, ease: "power2.inOut" })
+                        .to("#section1", { x: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    break;
+                    
+                case 1: // section1 → section2 (вниз)
+                    animation = gsap.timeline()
+                        .to("#section1", { y: "-100vh", duration: 1, ease: "power2.inOut" })
+                        .to("#section2", { y: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    break;
+                    
+                case 2: // section2 → contact (влево) - исправляем белый экран
+                    animation = gsap.timeline()
+                        .to("#section2", { x: "-100vw", duration: 1, ease: "power2.inOut" })
+                        .to("#contact", { x: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    break;
+                    
+                case 3: // contact → banner (вверх, banner сверху)
+                    animation = gsap.timeline()
+                        .to("#contact", { y: "-100vh", duration: 1, ease: "power2.inOut" })
+                        .to("#banner", { y: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    break;
             }
-        
-            const controller = new ScrollMagic.Controller();
-        
-            for (let id in map) {
-                const delta = 100 - 100 / map[id].$els.length;
-                const sign = (map[id].options.dir === 'left') ? '-' : '';
-                const animation = gsap.to(`#${id}`, {
-                    duration: 1,
-                    x: `${sign}${delta}%`,
-                    ease: "none"
-                });
 
-                new ScrollMagic.Scene({
-                    triggerElement: `#pin-${id}`,
-                    triggerHook: "onLeave",
-                    duration: `${map[id].$els.length}00%`
-                })
-                .setPin(`#pin-${id}`)
-                .setTween(animation)
-                .addTo(controller);    
-            }    
+            animation.eventCallback("onComplete", () => {
+                // Reset positions for next cycle
+                resetSectionPositions();
+                currentSection = (currentSection + 1) % sections.length;
+                isAnimating = false;
+            });
         }
+
+        // Previous section function
+        function previousSection() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const current = sections[currentSection];
+            const prev = sections[(currentSection - 1 + sections.length) % sections.length];
+            
+            let animation;
+            
+            switch(currentSection) {
+                case 0: // banner ← contact (вниз)
+                    animation = gsap.timeline()
+                        .to("#banner", { y: "100vh", duration: 1, ease: "power2.inOut" })
+                        .to("#contact", { y: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    break;
+                    
+                case 1: // section1 ← banner (влево)
+                    animation = gsap.timeline()
+                        .to("#section1", { x: "100vw", duration: 1, ease: "power2.inOut" })
+                        .to("#banner", { x: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    break;
+                    
+                case 2: // section2 ← section1 (вверх)
+                    animation = gsap.timeline()
+                        .to("#section2", { y: "100vh", duration: 1, ease: "power2.inOut" })
+                        .to("#section1", { y: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    break;
+                    
+                case 3: // contact ← section2 (вправо)
+                    animation = gsap.timeline()
+                        .to("#contact", { x: "-100vw", duration: 1, ease: "power2.inOut" })
+                        .to("#section2", { x: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    break;
+            }
+
+            animation.eventCallback("onComplete", () => {
+                // Reset positions for next cycle
+                resetPreviousSectionPositions();
+                currentSection = (currentSection - 1 + sections.length) % sections.length;
+                isAnimating = false;
+            });
+        }
+
+        // Reset section positions for previous navigation
+        function resetPreviousSectionPositions() {
+            const prevSection = (currentSection - 1 + sections.length) % sections.length;
+            
+            switch(prevSection) {
+                case 0: // banner (top-left)
+                    gsap.set("#banner", { x: 0, y: 0 });
+                    gsap.set("#section1", { x: "100vw", y: 0 });
+                    gsap.set("#section2", { x: 0, y: "100vh" });
+                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
+                    break;
+                case 1: // section1 (top-right)
+                    gsap.set("#banner", { x: "-100vw", y: 0 });
+                    gsap.set("#section1", { x: 0, y: 0 });
+                    gsap.set("#section2", { x: 0, y: "100vh" });
+                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
+                    break;
+                case 2: // section2 (bottom-left)
+                    gsap.set("#banner", { x: "-100vw", y: 0 });
+                    gsap.set("#section1", { x: 0, y: "-100vh" });
+                    gsap.set("#section2", { x: 0, y: 0 });
+                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
+                    break;
+                case 3: // contact (bottom-left)
+                    gsap.set("#banner", { x: "-100vw", y: 0 });
+                    gsap.set("#section1", { x: 0, y: "-100vh" });
+                    gsap.set("#section2", { x: "100vw", y: 0 });
+                    gsap.set("#contact", { x: 0, y: 0 });
+                    break;
+            }
+        }
+
+        // Reset section positions for next cycle
+        function resetSectionPositions() {
+            const nextSection = (currentSection + 1) % sections.length;
+            
+            switch(nextSection) {
+                case 0: // banner (top-left)
+                    gsap.set("#banner", { x: 0, y: 0 });
+                    gsap.set("#section1", { x: "100vw", y: 0 });
+                    gsap.set("#section2", { x: 0, y: "100vh" });
+                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
+                    break;
+                case 1: // section1 (top-right)
+                    gsap.set("#banner", { x: "-100vw", y: 0 });
+                    gsap.set("#section1", { x: 0, y: 0 });
+                    gsap.set("#section2", { x: 0, y: "100vh" });
+                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
+                    break;
+                case 2: // section2 (bottom-left)
+                    gsap.set("#banner", { x: "-100vw", y: 0 });
+                    gsap.set("#section1", { x: 0, y: "-100vh" });
+                    gsap.set("#section2", { x: 0, y: 0 });
+                    gsap.set("#contact", { x: "-100vw", y: "100vh" });
+                    break;
+                case 3: // contact (bottom-left)
+                    gsap.set("#banner", { x: "-100vw", y: 0 });
+                    gsap.set("#section1", { x: 0, y: "-100vh" });
+                    gsap.set("#section2", { x: "100vw", y: 0 });
+                    gsap.set("#contact", { x: 0, y: 0 });
+                    break;
+            }
+        }
+
+        // Scroll navigation - simplified
+        let scrollTimeout;
+        let isScrolling = false;
+
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            if (isScrolling || isAnimating) return;
+            
+            isScrolling = true;
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+            }, 800);
+
+            if (e.deltaY > 0) {
+                // Scroll down - next section
+                nextSection();
+                updateProgressIndicator();
+            } else if (e.deltaY < 0) {
+                // Scroll up - previous section
+                previousSection();
+                updateProgressIndicator();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                if (!isAnimating) {
+                    nextSection();
+                    updateProgressIndicator();
+                }
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                if (!isAnimating) {
+                    previousSection();
+                    updateProgressIndicator();
+                }
+            }
+        });
+
+        // Progress indicator functionality
+        function updateProgressIndicator() {
+            document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+                if (index === currentSection) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        // Click on progress dots - simplified
+        document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                if (index === currentSection || isAnimating) return;
+                
+                // Simple approach - just call nextSection until we reach target
+                if (index > currentSection) {
+                    const steps = index - currentSection;
+                    for (let i = 0; i < steps; i++) {
+                        setTimeout(() => {
+                            if (!isAnimating) {
+                                nextSection();
+                                updateProgressIndicator();
+                            }
+                        }, i * 200);
+                    }
+                } else {
+                    const steps = currentSection - index;
+                    for (let i = 0; i < steps; i++) {
+                        setTimeout(() => {
+                            if (!isAnimating) {
+                                previousSection();
+                                updateProgressIndicator();
+                            }
+                        }, i * 200);
+                    }
+                }
+            });
+        });
+
+        // Initialize progress indicator
+        updateProgressIndicator();
+
+
     </script>
 </body>
 </html>
