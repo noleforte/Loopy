@@ -19,19 +19,19 @@
 
      <!-- Main Container for GSAP Animations -->
      <div id="main-container">
-    <!-- Banner Section - Full Screen -->
+         <!-- Banner Section - Full Screen -->
          <section id="banner" class="banner">
-        <div class="banner-content">
-            <h1>Welcome to Loopy</h1>
-            <p>Experience the future of web design</p>
-                 <button class="cta-button" onclick="nextSection()">Get Started</button>
-        </div>
-    </section>
+            <div class="banner-content">
+                <h1 class="banner-title section-title"><span>Welcome to Loopy</span></h1>
+                <p>Experience the future of web design</p>
+                <button class="cta-button" onclick="nextSection()">Get Started</button>
+            </div>
+         </section>
 
          <!-- Section 1 - About Us -->
          <section id="section1" class="horizontal-section section-1">
         <div class="section-content">
-            <h2>About Us</h2>
+            <h2 class="section-title"><span>About Us</span></h2>
             <p>We create innovative digital experiences that push the boundaries of what's possible in web design and user interaction.</p>
             <div class="features">
                 <div class="feature">
@@ -54,7 +54,7 @@
          <!-- Section 2 - Services -->
          <section id="section2" class="horizontal-section section-2">
         <div class="section-content">
-            <h2>Our Services</h2>
+            <h2 class="section-title"><span>Our Services</span></h2>
             <p>Comprehensive digital solutions tailored to your needs</p>
             <div class="services">
                 <div class="service">
@@ -77,7 +77,7 @@
          <!-- Final Section - Contact -->
          <section id="contact" class="final-section">
         <div class="section-content">
-            <h2>Contact Us</h2>
+            <h2 class="section-title"><span>Contact Us</span></h2>
             <p>Ready to start your next project? Let's talk about how we can help you achieve your goals.</p>
             <div class="contact-info">
                 <div class="contact-item">
@@ -96,6 +96,10 @@
             <button class="nav-button" onclick="nextSection()">Back to Start</button>
         </div>
     </section>
+        <div class="section-underline"></div>
+        <svg class="underline-svg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
+            <path class="underline-path" />
+        </svg>
      </div>
 
     <!-- Footer -->
@@ -124,6 +128,190 @@
             { x: 0, y: -100 }   // contact -> banner (up)
         ];
         let isAnimating = false;
+        const container = document.querySelector('#main-container');
+        const underline = document.querySelector('.section-underline');
+        const underlineSvg = document.querySelector('.underline-svg');
+        const underlinePath = underlineSvg ? underlineSvg.querySelector('.underline-path') : null;
+        const underlineState = { x: 0, y: 0, width: 0, initialized: false, index: 0 };
+
+        const UNDERLINE_HEIGHT = 4;
+        const UNDERLINE_OFFSET = 8;
+        const DRAW_DURATION = 0.95;
+        const RETRACT_DELAY = 0.12;
+        const LANDING_DELAY = 0.7;
+        const GROWTH_DELAY = 0.85;
+
+        if (underline) {
+            gsap.set(underline, { x: 0, y: 0, width: 0, opacity: 0, scaleX: 1, transformOrigin: "left center" });
+        }
+
+        function syncUnderlineSvg() {
+            if (!underlineSvg || !container) return;
+            const rect = container.getBoundingClientRect();
+            underlineSvg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
+            underlineSvg.setAttribute('width', rect.width);
+            underlineSvg.setAttribute('height', rect.height);
+        }
+
+        syncUnderlineSvg();
+
+        if (underlinePath) {
+            gsap.set(underlinePath, { opacity: 0, strokeDashoffset: 0 });
+        }
+
+        function getHeadingSpan(index) {
+            const sectionId = sections[index];
+            return document.querySelector(`#${sectionId} .section-title span`);
+        }
+
+        function getUnderlineMetrics(index, span) {
+            const headingRect = span.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            const sectionEl = document.getElementById(sections[index]);
+            const offsetX = sectionEl ? parseFloat(gsap.getProperty(sectionEl, 'x')) || 0 : 0;
+            const offsetY = sectionEl ? parseFloat(gsap.getProperty(sectionEl, 'y')) || 0 : 0;
+            return {
+                x: headingRect.left - containerRect.left - offsetX,
+                y: headingRect.bottom - containerRect.top - offsetY + UNDERLINE_OFFSET,
+                width: headingRect.width
+            };
+        }
+
+        function placeUnderline(index) {
+            if (!underline) return;
+
+            syncUnderlineSvg();
+
+            if (underlineState.index === index && underlineState.initialized) {
+                gsap.set(underline, { opacity: 1 });
+                if (underlinePath) {
+                    gsap.set(underlinePath, { opacity: 0 });
+                }
+                return;
+            }
+
+            const targetSpan = getHeadingSpan(index);
+
+            if (!targetSpan) {
+                gsap.set(underline, { opacity: 0 });
+                underlineState.initialized = false;
+                underlineState.index = index;
+                return;
+            }
+
+            const { x, y, width } = getUnderlineMetrics(index, targetSpan);
+
+            if (underlinePath) {
+                gsap.set(underlinePath, { opacity: 0 });
+            }
+
+            gsap.set(underline, {
+                x,
+                y,
+                width,
+                scaleX: 1,
+                opacity: 1,
+                rotation: 0,
+                transformOrigin: "left center"
+            });
+
+            underlineState.x = x;
+            underlineState.y = y;
+            underlineState.width = width;
+            underlineState.initialized = true;
+            underlineState.index = index;
+        }
+
+        function animateUnderlineTo(index) {
+            const timeline = gsap.timeline();
+
+            if (!underline || !underlinePath) {
+                return timeline;
+            }
+
+            if (underlineState.index === index && underlineState.initialized) {
+                return timeline;
+            }
+
+            const targetSpan = getHeadingSpan(index);
+
+            if (!targetSpan) {
+                timeline.to(underline, { opacity: 0, duration: 0.3, ease: "power2.out" });
+                underlineState.initialized = false;
+                underlineState.index = index;
+                return timeline;
+            }
+
+            const { x: targetX, y: targetY, width: targetWidth } = getUnderlineMetrics(index, targetSpan);
+
+            if (!underlineState.initialized) {
+                placeUnderline(index);
+                return timeline;
+            }
+
+            const startCenterX = underlineState.x + underlineState.width / 2;
+            const startCenterY = underlineState.y + UNDERLINE_HEIGHT / 2;
+            const endCenterX = targetX + targetWidth / 2;
+            const endCenterY = targetY + UNDERLINE_HEIGHT / 2;
+
+            timeline.add(() => {
+                syncUnderlineSvg();
+                const controlX = (startCenterX + endCenterX) / 2;
+                const lift = Math.max(70, Math.abs(endCenterY - startCenterY) * 0.6 + Math.abs(endCenterX - startCenterX) * 0.25);
+                const controlY = Math.min(startCenterY, endCenterY) - lift;
+                const pathData = `M ${startCenterX} ${startCenterY} Q ${controlX} ${controlY} ${endCenterX} ${endCenterY}`;
+                underlinePath.setAttribute('d', pathData);
+                const length = underlinePath.getTotalLength();
+                underlinePath.style.strokeDasharray = length;
+                underlinePath.style.strokeDashoffset = length;
+            }, 0);
+
+            timeline.to(underlinePath, {
+                strokeDashoffset: 0,
+                opacity: 1,
+                duration: DRAW_DURATION,
+                ease: "power2.out"
+            }, 0);
+
+            timeline.to(underlinePath, {
+                opacity: 0,
+                duration: 0.35,
+                ease: "sine.out"
+            }, LANDING_DELAY);
+
+            timeline.to(underline, {
+                scaleX: 0,
+                duration: 0.25,
+                ease: "power2.in",
+                transformOrigin: "center center"
+            }, RETRACT_DELAY);
+
+            timeline.set(underline, {
+                x: targetX,
+                y: targetY,
+                width: targetWidth,
+                scaleX: 0,
+                opacity: 1,
+                transformOrigin: "left center",
+                rotation: 0
+            }, LANDING_DELAY);
+
+            timeline.to(underline, {
+                scaleX: 1,
+                duration: 0.45,
+                ease: "power2.out"
+            }, GROWTH_DELAY);
+
+            timeline.add(() => {
+                underlineState.x = targetX;
+                underlineState.y = targetY;
+                underlineState.width = targetWidth;
+                underlineState.initialized = true;
+                underlineState.index = index;
+            });
+
+            return timeline;
+        }
 
         const unitValue = (value, unit) => (value === 0 ? 0 : `${value}${unit}`);
 
@@ -162,8 +350,11 @@
                     positionSections(currentSection);
                     isAnimating = false;
                     updateProgressIndicator();
+                    placeUnderline(currentSection);
                 }
             });
+
+            animation.add(animateUnderlineTo(nextIndex), 0);
 
             if (direction.x !== 0) {
                 animation
@@ -194,8 +385,11 @@
                     positionSections(currentSection);
                     isAnimating = false;
                     updateProgressIndicator();
+                    placeUnderline(currentSection);
                 }
             });
+
+            animation.add(animateUnderlineTo(previousIndex), 0);
 
             if (deltaX !== 0) {
                 animation
@@ -289,8 +483,12 @@
         // Initialize layout and progress indicator
         positionSections(currentSection);
         updateProgressIndicator();
+        placeUnderline(currentSection);
 
-
+        window.addEventListener('resize', () => {
+            syncUnderlineSvg();
+            placeUnderline(currentSection);
+        });
     </script>
 </body>
 </html>
