@@ -272,8 +272,13 @@ body {
 }
 
 .animate-text {
-    opacity: 0;
-    transform: translateY(50px);
+    opacity: 0 !important;
+    transform: translateY(50px) !important;
+}
+
+.section-description.animate-text {
+    opacity: 0 !important;
+    transform: translateY(50px) !important;
 }
 
 
