@@ -115,10 +115,44 @@ body {
     color: white;
 }
 
+.section-title {
+    position: relative;
+    display: inline-block;
+}
+
+.section-title span {
+    display: inline-block;
+}
+
 .section-content h2 {
     font-size: 3rem;
     margin-bottom: 1rem;
     font-weight: 600;
+}
+
+.section-underline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.4));
+    border-radius: 999px;
+    pointer-events: none;
+    opacity: 0;
+    transform-origin: left center;
+}
+
+.underline-trail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2));
+    border-radius: 999px;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    box-shadow: 0 0 18px rgba(255, 255, 255, 0.35);
+    opacity: 0;
 }
 
 .section-content > p {
