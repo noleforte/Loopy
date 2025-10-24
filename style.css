@@ -5,6 +5,10 @@
     box-sizing: border-box;
 }
 
+:root {
+    --loopy-panorama: linear-gradient(135deg, #f196a8 0%, #e1788c 28%, #c8576e 46%, #f45d7b 64%, #fa728c 82%, #f66b85 100%);
+}
+
 html {
     /* scroll-behavior: smooth; - removed to avoid conflicts with ScrollToPlugin */
 }
@@ -34,16 +38,16 @@ body {
 .banner {
     height: 100vh;
     width: 100vw;
-    background: url(media/Layers1/pic_4.png);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     color: white;
     position: relative;
+    background-image: var(--loopy-panorama);
+    background-repeat: no-repeat;
+    background-size: 400% 400%;
+    background-position: 0% 50%;
 }
 
 .banner-content h1 {
@@ -87,25 +91,21 @@ body {
     flex-shrink: 0;
 }
 
-.section-1 {
-    background: url(media/Layers1/pic_3.png);
-    background-size: cover;
-    background-position: center;
+.section-1,
+.section-2,
+.section-3,
+.final-section {
+    background-image: var(--loopy-panorama);
     background-repeat: no-repeat;
+    background-size: 400% 400%;
+}
+
+.section-1 {
+    background-position: 33.333% 50%;
 }
 
 .section-2 {
-    background: url(media/Layers1/pic_2.png);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.section-3 {
-    background: url(media/Layers1/pic_1.png);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-position: 66.666% 50%;
 }
 
 .section-content {
@@ -194,14 +194,11 @@ body {
 .final-section {
     width: 100vw;
     height: 100vh;
-    background: url(media/Layers1/pic_1.png);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 5%;
+    background-position: 100% 50%;
 }
 
 .final-section .section-content {
