@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=2.2">
+    <link rel="stylesheet" href="style.css?v=1.3">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -19,19 +19,19 @@
 
      <!-- Main Container for GSAP Animations -->
      <div id="main-container">
-         <!-- Banner Section - Full Screen -->
+    <!-- Banner Section - Full Screen -->
          <section id="banner" class="banner">
-            <div class="banner-content">
-                <h1 class="banner-title section-title"><span>Welcome to Loopy</span></h1>
-                <p>Experience the future of web design</p>
-                <button class="cta-button" onclick="nextSection()">Get Started</button>
-            </div>
-         </section>
+        <div class="banner-content">
+            <h1>Welcome to Loopy</h1>
+            <p>Experience the future of web design</p>
+                 <button class="cta-button" onclick="nextSection()">Get Started</button>
+        </div>
+    </section>
 
          <!-- Section 1 - About Us -->
          <section id="section1" class="horizontal-section section-1">
         <div class="section-content">
-            <h2 class="section-title"><span>About Us</span></h2>
+            <h2>About Us</h2>
             <p>We create innovative digital experiences that push the boundaries of what's possible in web design and user interaction.</p>
             <div class="features">
                 <div class="feature">
@@ -54,7 +54,7 @@
          <!-- Section 2 - Services -->
          <section id="section2" class="horizontal-section section-2">
         <div class="section-content">
-            <h2 class="section-title"><span>Our Services</span></h2>
+            <h2>Our Services</h2>
             <p>Comprehensive digital solutions tailored to your needs</p>
             <div class="services">
                 <div class="service">
@@ -77,7 +77,7 @@
          <!-- Final Section - Contact -->
          <section id="contact" class="final-section">
         <div class="section-content">
-            <h2 class="section-title"><span>Contact Us</span></h2>
+            <h2>Contact Us</h2>
             <p>Ready to start your next project? Let's talk about how we can help you achieve your goals.</p>
             <div class="contact-info">
                 <div class="contact-item">
@@ -96,10 +96,6 @@
             <button class="nav-button" onclick="nextSection()">Back to Start</button>
         </div>
     </section>
-        <div class="section-underline"></div>
-        <svg class="underline-svg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
-            <path class="underline-path" />
-        </svg>
      </div>
 
     <!-- Footer -->
@@ -116,13 +112,8 @@
 
      <!-- GSAP Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js" integrity="sha512-gmwBmiTVER57N3jYS3LinA9eb8aHrJua5iQD7yqYCKa5x6Jjc7VDVaEA0je0Lu0bP9j7tEjV3+1qUm6loO99Kw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/ScrollSmoother.min.js"></script>
     
     <script>
-        // Register GSAP plugins
-        gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
-        
         // GSAP Square Navigation System
         let currentSection = 0;
         const sections = ['banner', 'section1', 'section2', 'contact'];
@@ -133,290 +124,6 @@
             { x: 0, y: -100 }   // contact -> banner (up)
         ];
         let isAnimating = false;
-        const container = document.querySelector('#main-container');
-        const underline = document.querySelector('.section-underline');
-        const underlineSvg = document.querySelector('.underline-svg');
-        const underlinePath = underlineSvg ? underlineSvg.querySelector('.underline-path') : null;
-        const underlineState = { x: 0, y: 0, width: 0, initialized: false, index: 0 };
-
-        const UNDERLINE_HEIGHT = 4;
-        const UNDERLINE_OFFSET = 2;
-        const DRAW_DURATION = 0.95;
-        
-        // ScrollSmoother instance
-        let scrollSmoother;
-
-        if (underline) {
-            gsap.set(underline, { x: 0, y: 0, width: 0, opacity: 0, scaleX: 1, transformOrigin: "left center" });
-        }
-
-        function syncUnderlineSvg() {
-            if (!underlineSvg || !container) return;
-            const rect = container.getBoundingClientRect();
-            underlineSvg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
-            underlineSvg.setAttribute('width', rect.width);
-            underlineSvg.setAttribute('height', rect.height);
-        }
-
-        syncUnderlineSvg();
-
-        if (underlinePath) {
-            gsap.set(underlinePath, { opacity: 0, strokeDashoffset: 0 });
-        }
-
-        function getHeadingSpan(index) {
-            const sectionId = sections[index];
-            return document.querySelector(`#${sectionId} .section-title span`);
-        }
-
-        function getUnderlineMetrics(index, span) {
-            const headingRect = span.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            const sectionEl = document.getElementById(sections[index]);
-            const offsetUnitsX = sectionEl ? parseFloat(sectionEl.dataset.offsetX || '0') : 0;
-            const offsetUnitsY = sectionEl ? parseFloat(sectionEl.dataset.offsetY || '0') : 0;
-            const offsetX = offsetUnitsX * window.innerWidth / 100;
-            const offsetY = offsetUnitsY * window.innerHeight / 100;
-            return {
-                x: headingRect.left - containerRect.left - offsetX,
-                y: headingRect.bottom - containerRect.top - offsetY + UNDERLINE_OFFSET,
-                width: headingRect.width
-            };
-        }
-
-        function getEdgePosition(fromIndex, toIndex) {
-            const direction = directions[fromIndex];
-            const containerRect = container.getBoundingClientRect();
-            const sectionEl = document.getElementById(sections[fromIndex]);
-            const offsetUnitsX = sectionEl ? parseFloat(sectionEl.dataset.offsetX || '0') : 0;
-            const offsetUnitsY = sectionEl ? parseFloat(sectionEl.dataset.offsetY || '0') : 0;
-            const offsetX = offsetUnitsX * window.innerWidth / 100;
-            const offsetY = offsetUnitsY * window.innerHeight / 100;
-            
-            let edgeX, edgeY;
-            
-            if (direction.x > 0) {
-                // Moving right - go to right edge
-                edgeX = containerRect.width - offsetX;
-                edgeY = containerRect.height / 2 - offsetY;
-            } else if (direction.x < 0) {
-                // Moving left - go to left edge
-                edgeX = -offsetX;
-                edgeY = containerRect.height / 2 - offsetY;
-            } else if (direction.y > 0) {
-                // Moving down - go to bottom edge
-                edgeX = containerRect.width / 2 - offsetX;
-                edgeY = containerRect.height - offsetY;
-            } else {
-                // Moving up - go to top edge
-                edgeX = containerRect.width / 2 - offsetX;
-                edgeY = -offsetY;
-            }
-            
-            return { x: edgeX, y: edgeY };
-        }
-
-        function getOppositeEdgePosition(fromIndex, toIndex) {
-            const direction = directions[fromIndex];
-            const containerRect = container.getBoundingClientRect();
-            const sectionEl = document.getElementById(sections[toIndex]);
-            const offsetUnitsX = sectionEl ? parseFloat(sectionEl.dataset.offsetX || '0') : 0;
-            const offsetUnitsY = sectionEl ? parseFloat(sectionEl.dataset.offsetY || '0') : 0;
-            const offsetX = offsetUnitsX * window.innerWidth / 100;
-            const offsetY = offsetUnitsY * window.innerHeight / 100;
-            
-            let edgeX, edgeY;
-            
-            if (direction.x > 0) {
-                // Moving right - appear from left edge of target section
-                edgeX = -offsetX;
-                edgeY = containerRect.height / 2 - offsetY;
-            } else if (direction.x < 0) {
-                // Moving left - appear from right edge of target section
-                edgeX = containerRect.width - offsetX;
-                edgeY = containerRect.height / 2 - offsetY;
-            } else if (direction.y > 0) {
-                // Moving down - appear from top edge of target section
-                edgeX = containerRect.width / 2 - offsetX;
-                edgeY = -offsetY;
-            } else {
-                // Moving up - appear from bottom edge of target section
-                edgeX = containerRect.width / 2 - offsetX;
-                edgeY = containerRect.height - offsetY;
-            }
-            
-            return { x: edgeX, y: edgeY };
-        }
-
-        function placeUnderline(index) {
-            if (!underline) return;
-
-            syncUnderlineSvg();
-
-            if (underlineState.index === index && underlineState.initialized) {
-                gsap.set(underline, { opacity: 1 });
-                if (underlinePath) {
-                    gsap.set(underlinePath, { opacity: 0 });
-                }
-                return;
-            }
-
-            const targetSpan = getHeadingSpan(index);
-
-            if (!targetSpan) {
-                console.log(`No target span found for index ${index}`);
-                gsap.set(underline, { opacity: 0 });
-                underlineState.initialized = false;
-                underlineState.index = index;
-                return;
-            }
-
-            const { x, y, width } = getUnderlineMetrics(index, targetSpan);
-
-            if (underlinePath) {
-                gsap.set(underlinePath, { opacity: 0 });
-            }
-
-            gsap.set(underline, {
-                x,
-                y,
-                width,
-                scaleX: 1,
-                opacity: 1,
-                rotation: 0,
-                transformOrigin: "left center"
-            });
-
-            underlineState.x = x;
-            underlineState.y = y;
-            underlineState.width = width;
-            underlineState.initialized = true;
-            underlineState.index = index;
-        }
-
-        function createOrganicPath(startX, startY, endX, endY, direction) {
-            const deltaX = endX - startX;
-            const deltaY = endY - startY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            
-            // Create organic control points with loops
-            let control1X, control1Y, control2X, control2Y;
-            
-            if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                // Horizontal movement
-                const midX = (startX + endX) / 2;
-                const loopHeight = Math.max(60, distance * 0.4);
-                const loopWidth = Math.max(40, distance * 0.2);
-                
-                control1X = startX + deltaX * 0.3;
-                control1Y = startY - loopHeight;
-                control2X = startX + deltaX * 0.7;
-                control2Y = endY - loopHeight;
-            } else {
-                // Vertical movement
-                const midY = (startY + endY) / 2;
-                const loopWidth = Math.max(60, distance * 0.4);
-                const loopHeight = Math.max(40, distance * 0.2);
-                
-                control1X = startX - loopWidth;
-                control1Y = startY + deltaY * 0.3;
-                control2X = endX - loopWidth;
-                control2Y = startY + deltaY * 0.7;
-            }
-            
-            return `M ${startX} ${startY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endX} ${endY}`;
-        }
-
-        function createDeadLoop(startX, startY, direction) {
-            const loopSize = 30;
-            let loopPath;
-            
-            if (direction.x > 0) {
-                // Right movement - create rightward loop
-                loopPath = `M ${startX} ${startY} C ${startX + loopSize} ${startY - loopSize/2}, ${startX + loopSize*2} ${startY - loopSize/2}, ${startX + loopSize*2} ${startY} C ${startX + loopSize*2} ${startY + loopSize/2}, ${startX + loopSize} ${startY + loopSize/2}, ${startX} ${startY}`;
-            } else if (direction.x < 0) {
-                // Left movement - create leftward loop
-                loopPath = `M ${startX} ${startY} C ${startX - loopSize} ${startY - loopSize/2}, ${startX - loopSize*2} ${startY - loopSize/2}, ${startX - loopSize*2} ${startY} C ${startX - loopSize*2} ${startY + loopSize/2}, ${startX - loopSize} ${startY + loopSize/2}, ${startX} ${startY}`;
-            } else if (direction.y > 0) {
-                // Down movement - create downward loop
-                loopPath = `M ${startX} ${startY} C ${startX - loopSize/2} ${startY + loopSize}, ${startX - loopSize/2} ${startY + loopSize*2}, ${startX} ${startY + loopSize*2} C ${startX + loopSize/2} ${startY + loopSize*2}, ${startX + loopSize/2} ${startY + loopSize}, ${startX} ${startY}`;
-            } else {
-                // Up movement - create upward loop
-                loopPath = `M ${startX} ${startY} C ${startX - loopSize/2} ${startY - loopSize}, ${startX - loopSize/2} ${startY - loopSize*2}, ${startX} ${startY - loopSize*2} C ${startX + loopSize/2} ${startY - loopSize*2}, ${startX + loopSize/2} ${startY - loopSize}, ${startX} ${startY}`;
-            }
-            
-            return loopPath;
-        }
-
-        function createScrollFollowingUnderline() {
-            if (!underline) return;
-
-            // Create ScrollTrigger for each section
-            sections.forEach((sectionId, index) => {
-                const section = document.getElementById(sectionId);
-                if (!section) return;
-
-                const targetSpan = getHeadingSpan(index);
-                if (!targetSpan) return;
-
-                ScrollTrigger.create({
-                    trigger: section,
-                    start: "top center",
-                    end: "bottom center",
-                    scrub: 0.7, // Smooth following like the circle example
-                    onUpdate: (self) => {
-                        const { x, y, width } = getUnderlineMetrics(index, targetSpan);
-                        
-                        // Smooth interpolation based on scroll progress
-                        const progress = self.progress;
-                        const currentWidth = gsap.utils.interpolate(0, width, progress);
-                        const currentOpacity = gsap.utils.interpolate(0, 1, progress);
-                        
-                        gsap.set(underline, {
-                            x: x,
-                            y: y,
-                            width: currentWidth,
-                            opacity: currentOpacity,
-                            scaleX: 1,
-                            scaleY: 1
-                        });
-                        
-                        underlineState.x = x;
-                        underlineState.y = y;
-                        underlineState.width = width;
-                        underlineState.initialized = true;
-                        underlineState.index = index;
-                    }
-                });
-            });
-        }
-
-        function createSeamlessPath(startX, startY, endX, endY, direction) {
-            const deltaX = endX - startX;
-            const deltaY = endY - startY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            
-            // Create smooth curve based on direction
-            let control1X, control1Y, control2X, control2Y;
-            
-            if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                // Horizontal movement - create horizontal curve
-                const curveHeight = Math.max(40, distance * 0.2);
-                control1X = startX + deltaX * 0.25;
-                control1Y = startY - curveHeight;
-                control2X = startX + deltaX * 0.75;
-                control2Y = endY - curveHeight;
-            } else {
-                // Vertical movement - create vertical curve
-                const curveWidth = Math.max(40, distance * 0.2);
-                control1X = startX - curveWidth;
-                control1Y = startY + deltaY * 0.25;
-                control2X = endX - curveWidth;
-                control2Y = startY + deltaY * 0.75;
-            }
-            
-            return `M ${startX} ${startY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endX} ${endY}`;
-        }
 
         const unitValue = (value, unit) => (value === 0 ? 0 : `${value}${unit}`);
 
@@ -425,27 +132,17 @@
             let offsetY = 0;
 
             const currentId = sections[centerIndex];
-            const currentEl = document.getElementById(currentId);
             gsap.set(`#${currentId}`, { x: 0, y: 0 });
-            if (currentEl) {
-                currentEl.dataset.offsetX = '0';
-                currentEl.dataset.offsetY = '0';
-            }
 
             for (let step = 1; step < sections.length; step++) {
                 const directionIndex = (centerIndex + step - 1 + directions.length) % directions.length;
                 offsetX += directions[directionIndex].x;
                 offsetY += directions[directionIndex].y;
                 const targetId = sections[(centerIndex + step) % sections.length];
-                const targetEl = document.getElementById(targetId);
                 gsap.set(`#${targetId}`, {
                     x: unitValue(offsetX, 'vw'),
                     y: unitValue(offsetY, 'vh')
                 });
-                if (targetEl) {
-                    targetEl.dataset.offsetX = offsetX.toString();
-                    targetEl.dataset.offsetY = offsetY.toString();
-                }
             }
         }
 
@@ -465,20 +162,17 @@
                     positionSections(currentSection);
                     isAnimating = false;
                     updateProgressIndicator();
-                    placeUnderline(currentSection);
                 }
             });
 
-            animation.add(animateUnderlineTo(nextIndex), 0);
-
             if (direction.x !== 0) {
                 animation
-                    .to(currentSelector, { x: unitValue(-Math.sign(direction.x) * 100, 'vw'), duration: 1.125, ease: "power2.inOut" })
-                    .to(nextSelector, { x: 0, duration: 1.125, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { x: unitValue(-Math.sign(direction.x) * 100, 'vw'), duration: 1, ease: "power2.inOut" })
+                    .to(nextSelector, { x: 0, duration: 1, ease: "power2.inOut" }, 0);
             } else {
                 animation
-                    .to(currentSelector, { y: unitValue(-Math.sign(direction.y) * 100, 'vh'), duration: 1.125, ease: "power2.inOut" })
-                    .to(nextSelector, { y: 0, duration: 1.125, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { y: unitValue(-Math.sign(direction.y) * 100, 'vh'), duration: 1, ease: "power2.inOut" })
+                    .to(nextSelector, { y: 0, duration: 1, ease: "power2.inOut" }, 0);
             }
         }
 
@@ -500,59 +194,41 @@
                     positionSections(currentSection);
                     isAnimating = false;
                     updateProgressIndicator();
-                    placeUnderline(currentSection);
                 }
             });
 
-            animation.add(animateUnderlineTo(previousIndex), 0);
-
             if (deltaX !== 0) {
                 animation
-                    .to(currentSelector, { x: unitValue(-Math.sign(deltaX) * 100, 'vw'), duration: 1.125, ease: "power2.inOut" })
-                    .to(previousSelector, { x: 0, duration: 1.125, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { x: unitValue(-Math.sign(deltaX) * 100, 'vw'), duration: 1, ease: "power2.inOut" })
+                    .to(previousSelector, { x: 0, duration: 1, ease: "power2.inOut" }, 0);
             } else {
                 animation
-                    .to(currentSelector, { y: unitValue(-Math.sign(deltaY) * 100, 'vh'), duration: 1.125, ease: "power2.inOut" })
-                    .to(previousSelector, { y: 0, duration: 1.125, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { y: unitValue(-Math.sign(deltaY) * 100, 'vh'), duration: 1, ease: "power2.inOut" })
+                    .to(previousSelector, { y: 0, duration: 1, ease: "power2.inOut" }, 0);
             }
         }
 
-        // Scroll navigation - improved with better timing and smoothness
+        // Scroll navigation - simplified
         let scrollTimeout;
         let isScrolling = false;
-        let scrollAccumulator = 0;
-        let lastScrollTime = 0;
-        const SCROLL_THRESHOLD = 30;
-        const SCROLL_DEBOUNCE = 100;
 
         document.addEventListener('wheel', (e) => {
             e.preventDefault();
             
-            const now = Date.now();
-            if (now - lastScrollTime < SCROLL_DEBOUNCE) return;
-            lastScrollTime = now;
-            
             if (isScrolling || isAnimating) return;
             
-            scrollAccumulator += e.deltaY;
-            
-            if (Math.abs(scrollAccumulator) >= SCROLL_THRESHOLD) {
-                isScrolling = true;
-                clearTimeout(scrollTimeout);
-                
-                if (scrollAccumulator > 0) {
-                    // Scroll down - next section
-                    nextSection();
-                } else {
-                    // Scroll up - previous section
-                    previousSection();
-                }
-                
-                scrollAccumulator = 0;
-                
-                scrollTimeout = setTimeout(() => {
-                    isScrolling = false;
-                }, 1000); // Shorter timeout for better responsiveness
+            isScrolling = true;
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+            }, 800);
+
+            if (e.deltaY > 0) {
+                // Scroll down - next section
+                nextSection();
+            } else if (e.deltaY < 0) {
+                // Scroll up - previous section
+                previousSection();
             }
         });
 
@@ -610,28 +286,11 @@
             });
         });
 
-        // Initialize ScrollSmoother
-        scrollSmoother = ScrollSmoother.create({
-            content: "#main-container",
-            wrapper: "body",
-            smooth: 1,
-            effects: false
-        });
-
         // Initialize layout and progress indicator
         positionSections(currentSection);
         updateProgressIndicator();
-        
-        // Initialize scroll-following underline
-        setTimeout(() => {
-            createScrollFollowingUnderline();
-        }, 100);
 
-        window.addEventListener('resize', () => {
-            positionSections(currentSection);
-            syncUnderlineSvg();
-            ScrollTrigger.refresh();
-        });
+
     </script>
 </body>
 </html>
