@@ -37,6 +37,8 @@ body {
     background: url(media/Layers1/pic_4.png);
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -90,18 +92,24 @@ body {
     background: url(media/Layers1/pic_3.png);
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 .section-2 {
     background: url(media/Layers1/pic_2.png);
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 .section-3 {
     background: url(media/Layers1/pic_1.png);
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 .section-content {
@@ -193,6 +201,8 @@ body {
     background: url(media/Layers1/pic_1.png);
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     display: flex;
     align-items: center;
     justify-content: center;
