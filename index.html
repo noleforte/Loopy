@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=1.4">
+    <link rel="stylesheet" href="style.css?v=1.5">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -226,21 +226,26 @@
             const timeline = gsap.timeline();
 
             if (!underline || !underlinePath) {
+                console.log('Underline elements not found');
                 return timeline;
             }
 
             if (underlineState.index === index && underlineState.initialized) {
+                console.log(`Underline already at section ${index}`);
                 return timeline;
             }
 
             const targetSpan = getHeadingSpan(index);
 
             if (!targetSpan) {
+                console.log(`No target span found for section ${index}`);
                 timeline.to(underline, { opacity: 0, duration: 0.3, ease: "power2.out" });
                 underlineState.initialized = false;
                 underlineState.index = index;
                 return timeline;
             }
+
+            console.log(`Animating underline from section ${underlineState.index} to section ${index}`);
 
             const { x: targetX, y: targetY, width: targetWidth } = getUnderlineMetrics(index, targetSpan);
 
@@ -259,9 +264,29 @@
 
             timeline.add(() => {
                 syncUnderlineSvg();
-                const controlX = (startCenterX + endCenterX) / 2;
-                const lift = Math.max(70, Math.abs(endCenterY - startCenterY) * 0.6 + Math.abs(endCenterX - startCenterX) * 0.25);
-                const controlY = Math.min(startCenterY, endCenterY) - lift;
+                
+                // Calculate control point based on direction
+                const deltaX = endCenterX - startCenterX;
+                const deltaY = endCenterY - startCenterY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                console.log(`Movement: deltaX=${deltaX.toFixed(1)}, deltaY=${deltaY.toFixed(1)}, distance=${distance.toFixed(1)}`);
+                
+                // Determine curve direction based on movement
+                let controlX, controlY;
+                
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    // Horizontal movement (left/right)
+                    controlX = (startCenterX + endCenterX) / 2;
+                    controlY = Math.min(startCenterY, endCenterY) - Math.max(50, distance * 0.3);
+                    console.log('Horizontal movement - curve up');
+                } else {
+                    // Vertical movement (up/down)
+                    controlX = Math.min(startCenterX, endCenterX) - Math.max(50, distance * 0.3);
+                    controlY = (startCenterY + endCenterY) / 2;
+                    console.log('Vertical movement - curve left');
+                }
+                
                 const pathData = `M ${startCenterX} ${startCenterY} Q ${controlX} ${controlY} ${endCenterX} ${endCenterY}`;
                 underlinePath.setAttribute('d', pathData);
                 pathLength = underlinePath.getTotalLength();
