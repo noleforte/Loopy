@@ -31,7 +31,7 @@
          <!-- Section 1 - About Us -->
          <section id="section1" class="horizontal-section section-1">
         <div class="section-content">
-            <h2>About Us</h2>
+            <h2 class="section-title"><span>About Us</span></h2>
             <p>We create innovative digital experiences that push the boundaries of what's possible in web design and user interaction.</p>
             <div class="features">
                 <div class="feature">
@@ -54,7 +54,7 @@
          <!-- Section 2 - Services -->
          <section id="section2" class="horizontal-section section-2">
         <div class="section-content">
-            <h2>Our Services</h2>
+            <h2 class="section-title"><span>Our Services</span></h2>
             <p>Comprehensive digital solutions tailored to your needs</p>
             <div class="services">
                 <div class="service">
@@ -77,7 +77,7 @@
          <!-- Final Section - Contact -->
          <section id="contact" class="final-section">
         <div class="section-content">
-            <h2>Contact Us</h2>
+            <h2 class="section-title"><span>Contact Us</span></h2>
             <p>Ready to start your next project? Let's talk about how we can help you achieve your goals.</p>
             <div class="contact-info">
                 <div class="contact-item">
@@ -96,6 +96,8 @@
             <button class="nav-button" onclick="nextSection()">Back to Start</button>
         </div>
     </section>
+        <div class="underline-trail"></div>
+        <div class="section-underline"></div>
      </div>
 
     <!-- Footer -->
@@ -124,6 +126,147 @@
             { x: 0, y: -100 }   // contact -> banner (up)
         ];
         let isAnimating = false;
+        const container = document.querySelector('#main-container');
+        const underline = document.querySelector('.section-underline');
+        const trail = document.querySelector('.underline-trail');
+        const underlineState = { x: 0, y: 0, width: 0, initialized: false };
+        let underlineTimeline;
+
+        const UNDERLINE_HEIGHT = 4;
+
+        if (underline) {
+            gsap.set(underline, { x: 0, y: 0, width: 0, opacity: 0, scaleX: 1 });
+        }
+
+        if (trail) {
+            gsap.set(trail, { x: 0, y: 0, width: 0, opacity: 0 });
+        }
+
+        function moveUnderline(targetIndex = currentSection, options = {}) {
+            if (!underline) return;
+
+            const targetHeading = document.querySelector(`#${sections[targetIndex]} .section-title span`);
+            const immediate = options.immediate === true;
+
+            if (!targetHeading) {
+                gsap.to(underline, { opacity: 0, duration: 0.3, ease: "power2.out" });
+                underlineState.initialized = false;
+                return;
+            }
+
+            const headingRect = targetHeading.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            const targetX = headingRect.left - containerRect.left;
+            const targetY = headingRect.bottom - containerRect.top + 8;
+            const targetWidth = headingRect.width;
+
+            if (!underlineState.initialized || immediate) {
+                if (underlineTimeline) {
+                    underlineTimeline.kill();
+                    underlineTimeline = null;
+                }
+
+                if (trail) {
+                    gsap.set(trail, { opacity: 0, width: 0 });
+                }
+
+                gsap.set(underline, {
+                    x: targetX,
+                    y: targetY,
+                    width: targetWidth,
+                    scaleX: 1,
+                    opacity: 1
+                });
+
+                underlineState.x = targetX;
+                underlineState.y = targetY;
+                underlineState.width = targetWidth;
+                underlineState.initialized = true;
+                return;
+            }
+
+            const startX = underlineState.x + underlineState.width / 2;
+            const startY = underlineState.y + UNDERLINE_HEIGHT / 2;
+            const endX = targetX + targetWidth / 2;
+            const endY = targetY + UNDERLINE_HEIGHT / 2;
+            const deltaX = endX - startX;
+            const deltaY = endY - startY;
+            const distance = Math.hypot(deltaX, deltaY);
+
+            if (distance === 0) {
+                gsap.to(underline, {
+                    duration: 0.35,
+                    x: targetX,
+                    y: targetY,
+                    width: targetWidth,
+                    scaleX: 1,
+                    opacity: 1,
+                    ease: "power2.out"
+                });
+
+                underlineState.x = targetX;
+                underlineState.y = targetY;
+                underlineState.width = targetWidth;
+                underlineState.initialized = true;
+                return;
+            }
+
+            const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+
+            if (underlineTimeline) {
+                underlineTimeline.kill();
+            }
+
+            underlineTimeline = gsap.timeline({
+                onComplete: () => {
+                    underlineState.x = targetX;
+                    underlineState.y = targetY;
+                    underlineState.width = targetWidth;
+                    underlineState.initialized = true;
+                    underlineTimeline = null;
+                }
+            });
+
+            if (trail) {
+                underlineTimeline.set(trail, {
+                    x: startX,
+                    y: startY,
+                    width: 0,
+                    height: UNDERLINE_HEIGHT,
+                    rotation: angle,
+                    opacity: 1,
+                    transformOrigin: "left center"
+                });
+
+                underlineTimeline.to(trail, {
+                    width: distance,
+                    duration: 0.45,
+                    ease: "power2.out"
+                });
+
+                underlineTimeline.to(trail, {
+                    opacity: 0,
+                    duration: 0.2,
+                    ease: "sine.out"
+                }, "-=0.1");
+            }
+
+            underlineTimeline.set(underline, {
+                x: targetX,
+                y: targetY,
+                width: targetWidth,
+                scaleX: 0,
+                opacity: 1,
+                transformOrigin: "left center",
+                rotation: 0
+            }, "<");
+
+            underlineTimeline.to(underline, {
+                scaleX: 1,
+                duration: 0.35,
+                ease: "power2.out"
+            }, "-=0.05");
+        }
 
         const unitValue = (value, unit) => (value === 0 ? 0 : `${value}${unit}`);
 
@@ -161,6 +304,7 @@
                     currentSection = nextIndex;
                     positionSections(currentSection);
                     isAnimating = false;
+                    moveUnderline(currentSection);
                     updateProgressIndicator();
                 }
             });
@@ -193,6 +337,7 @@
                     currentSection = previousIndex;
                     positionSections(currentSection);
                     isAnimating = false;
+                    moveUnderline(currentSection);
                     updateProgressIndicator();
                 }
             });
@@ -289,8 +434,9 @@
         // Initialize layout and progress indicator
         positionSections(currentSection);
         updateProgressIndicator();
+        moveUnderline(currentSection, { immediate: true });
 
-
+        window.addEventListener('resize', () => moveUnderline(currentSection, { immediate: true }));
     </script>
 </body>
 </html>
