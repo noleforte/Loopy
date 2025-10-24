@@ -273,11 +273,6 @@ body {
 
 .animate-text {
     opacity: 0;
-    transform: translateY(20px);
-}
-
-.section-description {
-    opacity: 0;
     transform: translateY(50px);
 }
 
