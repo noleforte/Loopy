@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=1.3">
+    <link rel="stylesheet" href="style.css?v=1.8">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -428,27 +428,42 @@
             }
         }
 
-        // Scroll navigation - simplified
+        // Scroll navigation - improved with better timing and smoothness
         let scrollTimeout;
         let isScrolling = false;
+        let scrollAccumulator = 0;
+        let lastScrollTime = 0;
+        const SCROLL_THRESHOLD = 30;
+        const SCROLL_DEBOUNCE = 100;
 
         document.addEventListener('wheel', (e) => {
             e.preventDefault();
             
+            const now = Date.now();
+            if (now - lastScrollTime < SCROLL_DEBOUNCE) return;
+            lastScrollTime = now;
+            
             if (isScrolling || isAnimating) return;
             
-            isScrolling = true;
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                isScrolling = false;
-            }, 800);
-
-            if (e.deltaY > 0) {
-                // Scroll down - next section
-                nextSection();
-            } else if (e.deltaY < 0) {
-                // Scroll up - previous section
-                previousSection();
+            scrollAccumulator += e.deltaY;
+            
+            if (Math.abs(scrollAccumulator) >= SCROLL_THRESHOLD) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+                
+                if (scrollAccumulator > 0) {
+                    // Scroll down - next section
+                    nextSection();
+                } else {
+                    // Scroll up - previous section
+                    previousSection();
+                }
+                
+                scrollAccumulator = 0;
+                
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000); // Shorter timeout for better responsiveness
             }
         });
 
