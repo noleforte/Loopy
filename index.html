@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=2.4">
+    <link rel="stylesheet" href="style.css?v=2.5">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -343,7 +343,7 @@
                 ease: "power3.out"
             });
 
-            // Animate description with special effect
+            // Animate description
             const description = section.querySelector('.animate-text');
             if (description) {
                 tl.to(description, {
@@ -352,24 +352,6 @@
                     duration: 0.8,
                     ease: "power3.out"
                 }, "-=0.6");
-                
-                // Add typewriter effect for description
-                if (description.classList.contains('section-description')) {
-                    const text = description.textContent;
-                    description.textContent = '';
-                    description.style.borderRight = '2px solid rgba(255, 255, 255, 0.7)';
-                    
-                    tl.to({}, {
-                        duration: 0.05,
-                        repeat: text.length - 1,
-                        onRepeat: function() {
-                            description.textContent = text.substring(0, this.repeat() + 1);
-                        },
-                        onComplete: function() {
-                            description.style.borderRight = 'none';
-                        }
-                    }, "-=0.4");
-                }
             }
 
             // Animate cards with stagger

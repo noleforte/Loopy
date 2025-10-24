@@ -276,14 +276,6 @@ body {
     transform: translateY(20px);
 }
 
-.section-description {
-    overflow: hidden;
-}
-
-.section-description.animate-text {
-    opacity: 0;
-    transform: translateY(20px);
-}
 
 .animate-button {
     opacity: 0;
