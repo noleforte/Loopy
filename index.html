@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=1.7">
+    <link rel="stylesheet" href="style.css?v=1.8">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -220,19 +220,19 @@
             let edgeX, edgeY;
             
             if (direction.x > 0) {
-                // Moving right - appear from left edge
+                // Moving right - appear from left edge of target section
                 edgeX = -offsetX;
                 edgeY = containerRect.height / 2 - offsetY;
             } else if (direction.x < 0) {
-                // Moving left - appear from right edge
+                // Moving left - appear from right edge of target section
                 edgeX = containerRect.width - offsetX;
                 edgeY = containerRect.height / 2 - offsetY;
             } else if (direction.y > 0) {
-                // Moving down - appear from top edge
+                // Moving down - appear from top edge of target section
                 edgeX = containerRect.width / 2 - offsetX;
                 edgeY = -offsetY;
             } else {
-                // Moving up - appear from bottom edge
+                // Moving up - appear from bottom edge of target section
                 edgeX = containerRect.width / 2 - offsetX;
                 edgeY = containerRect.height - offsetY;
             }
@@ -382,9 +382,15 @@
             const startCenterY = underlineState.y + UNDERLINE_HEIGHT / 2;
             const endCenterX = targetX + targetWidth / 2;
             const endCenterY = targetY + UNDERLINE_HEIGHT / 2;
-            const startWidth = underlineState.width;
 
-            // Phase 1: Dead loop animation at current position
+            // Phase 1: Hide current underline
+            timeline.to(underline, {
+                opacity: 0,
+                duration: 0.2,
+                ease: "power2.out"
+            });
+
+            // Phase 2: Dead loop animation at current position
             timeline.add(() => {
                 syncUnderlineSvg();
                 const loopPath = createDeadLoop(startCenterX, startCenterY, direction);
@@ -397,11 +403,11 @@
 
             timeline.to(underlinePath, {
                 strokeDashoffset: 0,
-                duration: 0.4,
+                duration: 0.3,
                 ease: "power2.inOut"
             });
 
-            // Phase 2: Move to edge with organic path
+            // Phase 3: Organic path to edge
             timeline.add(() => {
                 const organicPath = createOrganicPath(startCenterX, startCenterY, edgePos.x, edgePos.y, direction);
                 underlinePath.setAttribute('d', organicPath);
@@ -410,55 +416,58 @@
                 underlinePath.style.strokeDashoffset = 0;
             });
 
-            timeline.to(underline, {
-                x: edgePos.x - startWidth / 2,
-                y: edgePos.y - UNDERLINE_HEIGHT / 2,
-                duration: 0.5,
+            timeline.to(underlinePath, {
+                strokeDashoffset: 0,
+                duration: 0.4,
                 ease: "power2.out"
             });
 
-            // Phase 3: Hide and move to opposite edge
-            timeline.to(underline, {
+            // Phase 4: Hide path and show brush at opposite edge
+            timeline.to(underlinePath, {
                 opacity: 0,
                 duration: 0.1,
                 ease: "power2.out"
             });
 
             timeline.add(() => {
+                // Position brush at opposite edge
                 gsap.set(underline, {
-                    x: oppositeEdgePos.x - startWidth / 2,
+                    x: oppositeEdgePos.x - 20,
                     y: oppositeEdgePos.y - UNDERLINE_HEIGHT / 2,
+                    width: 20,
                     opacity: 1
                 });
             });
 
-            // Phase 4: Organic path from opposite edge to target
+            // Phase 5: Organic path from opposite edge to target
             timeline.add(() => {
                 const organicPath = createOrganicPath(oppositeEdgePos.x, oppositeEdgePos.y, endCenterX, endCenterY, direction);
                 underlinePath.setAttribute('d', organicPath);
                 const pathLength = underlinePath.getTotalLength();
                 underlinePath.style.strokeDasharray = pathLength;
                 underlinePath.style.strokeDashoffset = pathLength;
+                gsap.set(underlinePath, { opacity: 1 });
             });
 
             timeline.to(underlinePath, {
                 strokeDashoffset: 0,
-                duration: 0.6,
+                duration: 0.5,
                 ease: "power2.out"
             });
 
+            // Phase 6: Brush becomes underline
             timeline.to(underline, {
                 x: targetX,
                 y: targetY,
                 width: targetWidth,
-                duration: 0.6,
+                duration: 0.3,
                 ease: "power2.out"
             });
 
-            // Phase 5: Final fade out of path
+            // Phase 7: Hide path
             timeline.to(underlinePath, {
                 opacity: 0,
-                duration: 0.3,
+                duration: 0.2,
                 ease: "power2.out"
             });
 
@@ -572,14 +581,20 @@
             }
         }
 
-        // Scroll navigation - improved with better timing
+        // Scroll navigation - improved with better timing and smoothness
         let scrollTimeout;
         let isScrolling = false;
         let scrollAccumulator = 0;
-        const SCROLL_THRESHOLD = 50;
+        let lastScrollTime = 0;
+        const SCROLL_THRESHOLD = 30;
+        const SCROLL_DEBOUNCE = 100;
 
         document.addEventListener('wheel', (e) => {
             e.preventDefault();
+            
+            const now = Date.now();
+            if (now - lastScrollTime < SCROLL_DEBOUNCE) return;
+            lastScrollTime = now;
             
             if (isScrolling || isAnimating) return;
             
@@ -601,7 +616,7 @@
                 
                 scrollTimeout = setTimeout(() => {
                     isScrolling = false;
-                }, 1200); // Longer timeout for organic feel
+                }, 1000); // Shorter timeout for better responsiveness
             }
         });
 
