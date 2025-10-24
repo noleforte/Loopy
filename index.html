@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=1.3">
+    <link rel="stylesheet" href="style.css?v=1.9">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -340,17 +340,27 @@
             let offsetY = 0;
 
             const currentId = sections[centerIndex];
+            const currentEl = document.getElementById(currentId);
             gsap.set(`#${currentId}`, { x: 0, y: 0 });
+            if (currentEl) {
+                currentEl.dataset.offsetX = '0';
+                currentEl.dataset.offsetY = '0';
+            }
 
             for (let step = 1; step < sections.length; step++) {
                 const directionIndex = (centerIndex + step - 1 + directions.length) % directions.length;
                 offsetX += directions[directionIndex].x;
                 offsetY += directions[directionIndex].y;
                 const targetId = sections[(centerIndex + step) % sections.length];
+                const targetEl = document.getElementById(targetId);
                 gsap.set(`#${targetId}`, {
                     x: unitValue(offsetX, 'vw'),
                     y: unitValue(offsetY, 'vh')
                 });
+                if (targetEl) {
+                    targetEl.dataset.offsetX = offsetX.toString();
+                    targetEl.dataset.offsetY = offsetY.toString();
+                }
             }
         }
 
@@ -378,12 +388,12 @@
 
             if (direction.x !== 0) {
                 animation
-                    .to(currentSelector, { x: unitValue(-Math.sign(direction.x) * 100, 'vw'), duration: 1, ease: "power2.inOut" })
-                    .to(nextSelector, { x: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { x: unitValue(-Math.sign(direction.x) * 100, 'vw'), duration: 1.5, ease: "power2.inOut" })
+                    .to(nextSelector, { x: 0, duration: 1.5, ease: "power2.inOut" }, 0);
             } else {
                 animation
-                    .to(currentSelector, { y: unitValue(-Math.sign(direction.y) * 100, 'vh'), duration: 1, ease: "power2.inOut" })
-                    .to(nextSelector, { y: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { y: unitValue(-Math.sign(direction.y) * 100, 'vh'), duration: 1.5, ease: "power2.inOut" })
+                    .to(nextSelector, { y: 0, duration: 1.5, ease: "power2.inOut" }, 0);
             }
         }
 
@@ -413,36 +423,51 @@
 
             if (deltaX !== 0) {
                 animation
-                    .to(currentSelector, { x: unitValue(-Math.sign(deltaX) * 100, 'vw'), duration: 1, ease: "power2.inOut" })
-                    .to(previousSelector, { x: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { x: unitValue(-Math.sign(deltaX) * 100, 'vw'), duration: 1.5, ease: "power2.inOut" })
+                    .to(previousSelector, { x: 0, duration: 1.5, ease: "power2.inOut" }, 0);
             } else {
                 animation
-                    .to(currentSelector, { y: unitValue(-Math.sign(deltaY) * 100, 'vh'), duration: 1, ease: "power2.inOut" })
-                    .to(previousSelector, { y: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { y: unitValue(-Math.sign(deltaY) * 100, 'vh'), duration: 1.5, ease: "power2.inOut" })
+                    .to(previousSelector, { y: 0, duration: 1.5, ease: "power2.inOut" }, 0);
             }
         }
 
-        // Scroll navigation - simplified
+        // Scroll navigation - improved with better timing and smoothness
         let scrollTimeout;
         let isScrolling = false;
+        let scrollAccumulator = 0;
+        let lastScrollTime = 0;
+        const SCROLL_THRESHOLD = 30;
+        const SCROLL_DEBOUNCE = 100;
 
         document.addEventListener('wheel', (e) => {
             e.preventDefault();
             
+            const now = Date.now();
+            if (now - lastScrollTime < SCROLL_DEBOUNCE) return;
+            lastScrollTime = now;
+            
             if (isScrolling || isAnimating) return;
             
-            isScrolling = true;
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                isScrolling = false;
-            }, 800);
-
-            if (e.deltaY > 0) {
-                // Scroll down - next section
-                nextSection();
-            } else if (e.deltaY < 0) {
-                // Scroll up - previous section
-                previousSection();
+            scrollAccumulator += e.deltaY;
+            
+            if (Math.abs(scrollAccumulator) >= SCROLL_THRESHOLD) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+                
+                if (scrollAccumulator > 0) {
+                    // Scroll down - next section
+                    nextSection();
+                } else {
+                    // Scroll up - previous section
+                    previousSection();
+                }
+                
+                scrollAccumulator = 0;
+                
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000); // Shorter timeout for better responsiveness
             }
         });
 
