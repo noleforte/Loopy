@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=1.6">
+    <link rel="stylesheet" href="style.css?v=1.7">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -286,6 +286,60 @@
             underlineState.index = index;
         }
 
+        function createOrganicPath(startX, startY, endX, endY, direction) {
+            const deltaX = endX - startX;
+            const deltaY = endY - startY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            // Create organic control points with loops
+            let control1X, control1Y, control2X, control2Y;
+            
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                // Horizontal movement
+                const midX = (startX + endX) / 2;
+                const loopHeight = Math.max(60, distance * 0.4);
+                const loopWidth = Math.max(40, distance * 0.2);
+                
+                control1X = startX + deltaX * 0.3;
+                control1Y = startY - loopHeight;
+                control2X = startX + deltaX * 0.7;
+                control2Y = endY - loopHeight;
+            } else {
+                // Vertical movement
+                const midY = (startY + endY) / 2;
+                const loopWidth = Math.max(60, distance * 0.4);
+                const loopHeight = Math.max(40, distance * 0.2);
+                
+                control1X = startX - loopWidth;
+                control1Y = startY + deltaY * 0.3;
+                control2X = endX - loopWidth;
+                control2Y = startY + deltaY * 0.7;
+            }
+            
+            return `M ${startX} ${startY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endX} ${endY}`;
+        }
+
+        function createDeadLoop(startX, startY, direction) {
+            const loopSize = 30;
+            let loopPath;
+            
+            if (direction.x > 0) {
+                // Right movement - create rightward loop
+                loopPath = `M ${startX} ${startY} C ${startX + loopSize} ${startY - loopSize/2}, ${startX + loopSize*2} ${startY - loopSize/2}, ${startX + loopSize*2} ${startY} C ${startX + loopSize*2} ${startY + loopSize/2}, ${startX + loopSize} ${startY + loopSize/2}, ${startX} ${startY}`;
+            } else if (direction.x < 0) {
+                // Left movement - create leftward loop
+                loopPath = `M ${startX} ${startY} C ${startX - loopSize} ${startY - loopSize/2}, ${startX - loopSize*2} ${startY - loopSize/2}, ${startX - loopSize*2} ${startY} C ${startX - loopSize*2} ${startY + loopSize/2}, ${startX - loopSize} ${startY + loopSize/2}, ${startX} ${startY}`;
+            } else if (direction.y > 0) {
+                // Down movement - create downward loop
+                loopPath = `M ${startX} ${startY} C ${startX - loopSize/2} ${startY + loopSize}, ${startX - loopSize/2} ${startY + loopSize*2}, ${startX} ${startY + loopSize*2} C ${startX + loopSize/2} ${startY + loopSize*2}, ${startX + loopSize/2} ${startY + loopSize}, ${startX} ${startY}`;
+            } else {
+                // Up movement - create upward loop
+                loopPath = `M ${startX} ${startY} C ${startX - loopSize/2} ${startY - loopSize}, ${startX - loopSize/2} ${startY - loopSize*2}, ${startX} ${startY - loopSize*2} C ${startX + loopSize/2} ${startY - loopSize*2}, ${startX + loopSize/2} ${startY - loopSize}, ${startX} ${startY}`;
+            }
+            
+            return loopPath;
+        }
+
         function animateUnderlineTo(index) {
             const timeline = gsap.timeline();
 
@@ -320,6 +374,7 @@
 
             // Get edge positions
             const fromIndex = underlineState.index;
+            const direction = directions[fromIndex];
             const edgePos = getEdgePosition(fromIndex, index);
             const oppositeEdgePos = getOppositeEdgePosition(fromIndex, index);
             
@@ -329,15 +384,40 @@
             const endCenterY = targetY + UNDERLINE_HEIGHT / 2;
             const startWidth = underlineState.width;
 
-            // Phase 1: Move to edge of current section
+            // Phase 1: Dead loop animation at current position
+            timeline.add(() => {
+                syncUnderlineSvg();
+                const loopPath = createDeadLoop(startCenterX, startCenterY, direction);
+                underlinePath.setAttribute('d', loopPath);
+                const pathLength = underlinePath.getTotalLength();
+                underlinePath.style.strokeDasharray = pathLength;
+                underlinePath.style.strokeDashoffset = pathLength;
+                gsap.set(underlinePath, { opacity: 1 });
+            });
+
+            timeline.to(underlinePath, {
+                strokeDashoffset: 0,
+                duration: 0.4,
+                ease: "power2.inOut"
+            });
+
+            // Phase 2: Move to edge with organic path
+            timeline.add(() => {
+                const organicPath = createOrganicPath(startCenterX, startCenterY, edgePos.x, edgePos.y, direction);
+                underlinePath.setAttribute('d', organicPath);
+                const pathLength = underlinePath.getTotalLength();
+                underlinePath.style.strokeDasharray = pathLength;
+                underlinePath.style.strokeDashoffset = 0;
+            });
+
             timeline.to(underline, {
                 x: edgePos.x - startWidth / 2,
                 y: edgePos.y - UNDERLINE_HEIGHT / 2,
-                duration: 0.3,
+                duration: 0.5,
                 ease: "power2.out"
             });
 
-            // Phase 2: Hide and move to opposite edge
+            // Phase 3: Hide and move to opposite edge
             timeline.to(underline, {
                 opacity: 0,
                 duration: 0.1,
@@ -352,12 +432,33 @@
                 });
             });
 
-            // Phase 3: Move from opposite edge to target heading
+            // Phase 4: Organic path from opposite edge to target
+            timeline.add(() => {
+                const organicPath = createOrganicPath(oppositeEdgePos.x, oppositeEdgePos.y, endCenterX, endCenterY, direction);
+                underlinePath.setAttribute('d', organicPath);
+                const pathLength = underlinePath.getTotalLength();
+                underlinePath.style.strokeDasharray = pathLength;
+                underlinePath.style.strokeDashoffset = pathLength;
+            });
+
+            timeline.to(underlinePath, {
+                strokeDashoffset: 0,
+                duration: 0.6,
+                ease: "power2.out"
+            });
+
             timeline.to(underline, {
                 x: targetX,
                 y: targetY,
                 width: targetWidth,
-                duration: 0.4,
+                duration: 0.6,
+                ease: "power2.out"
+            });
+
+            // Phase 5: Final fade out of path
+            timeline.to(underlinePath, {
+                opacity: 0,
+                duration: 0.3,
                 ease: "power2.out"
             });
 
@@ -471,27 +572,36 @@
             }
         }
 
-        // Scroll navigation - simplified
+        // Scroll navigation - improved with better timing
         let scrollTimeout;
         let isScrolling = false;
+        let scrollAccumulator = 0;
+        const SCROLL_THRESHOLD = 50;
 
         document.addEventListener('wheel', (e) => {
             e.preventDefault();
             
             if (isScrolling || isAnimating) return;
             
-            isScrolling = true;
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                isScrolling = false;
-            }, 800);
-
-            if (e.deltaY > 0) {
-                // Scroll down - next section
-                nextSection();
-            } else if (e.deltaY < 0) {
-                // Scroll up - previous section
-                previousSection();
+            scrollAccumulator += e.deltaY;
+            
+            if (Math.abs(scrollAccumulator) >= SCROLL_THRESHOLD) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+                
+                if (scrollAccumulator > 0) {
+                    // Scroll down - next section
+                    nextSection();
+                } else {
+                    // Scroll up - previous section
+                    previousSection();
+                }
+                
+                scrollAccumulator = 0;
+                
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1200); // Longer timeout for organic feel
             }
         });
 

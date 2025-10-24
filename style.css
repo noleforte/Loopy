@@ -157,11 +157,12 @@ body {
 .underline-path {
     fill: none;
     stroke: rgba(255, 255, 255, 0.9);
-    stroke-width: 4;
+    stroke-width: 3;
     stroke-linecap: round;
     stroke-linejoin: round;
-    filter: none;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
     opacity: 0;
+    stroke-dasharray: none;
 }
 
 .section-content > p {
