@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=1.8">
+    <link rel="stylesheet" href="style.css?v=1.9">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -386,7 +386,7 @@
             // Phase 1: Hide current underline
             timeline.to(underline, {
                 opacity: 0,
-                duration: 0.2,
+                duration: 0.4,
                 ease: "power2.out"
             });
 
@@ -403,7 +403,7 @@
 
             timeline.to(underlinePath, {
                 strokeDashoffset: 0,
-                duration: 0.3,
+                duration: 0.6,
                 ease: "power2.inOut"
             });
 
@@ -418,14 +418,14 @@
 
             timeline.to(underlinePath, {
                 strokeDashoffset: 0,
-                duration: 0.4,
+                duration: 0.8,
                 ease: "power2.out"
             });
 
             // Phase 4: Hide path and show brush at opposite edge
             timeline.to(underlinePath, {
                 opacity: 0,
-                duration: 0.1,
+                duration: 0.2,
                 ease: "power2.out"
             });
 
@@ -451,7 +451,7 @@
 
             timeline.to(underlinePath, {
                 strokeDashoffset: 0,
-                duration: 0.5,
+                duration: 1.0,
                 ease: "power2.out"
             });
 
@@ -460,14 +460,14 @@
                 x: targetX,
                 y: targetY,
                 width: targetWidth,
-                duration: 0.3,
+                duration: 0.6,
                 ease: "power2.out"
             });
 
             // Phase 7: Hide path
             timeline.to(underlinePath, {
                 opacity: 0,
-                duration: 0.2,
+                duration: 0.4,
                 ease: "power2.out"
             });
 
@@ -537,12 +537,12 @@
 
             if (direction.x !== 0) {
                 animation
-                    .to(currentSelector, { x: unitValue(-Math.sign(direction.x) * 100, 'vw'), duration: 1, ease: "power2.inOut" })
-                    .to(nextSelector, { x: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { x: unitValue(-Math.sign(direction.x) * 100, 'vw'), duration: 1.5, ease: "power2.inOut" })
+                    .to(nextSelector, { x: 0, duration: 1.5, ease: "power2.inOut" }, 0);
             } else {
                 animation
-                    .to(currentSelector, { y: unitValue(-Math.sign(direction.y) * 100, 'vh'), duration: 1, ease: "power2.inOut" })
-                    .to(nextSelector, { y: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { y: unitValue(-Math.sign(direction.y) * 100, 'vh'), duration: 1.5, ease: "power2.inOut" })
+                    .to(nextSelector, { y: 0, duration: 1.5, ease: "power2.inOut" }, 0);
             }
         }
 
@@ -572,12 +572,12 @@
 
             if (deltaX !== 0) {
                 animation
-                    .to(currentSelector, { x: unitValue(-Math.sign(deltaX) * 100, 'vw'), duration: 1, ease: "power2.inOut" })
-                    .to(previousSelector, { x: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { x: unitValue(-Math.sign(deltaX) * 100, 'vw'), duration: 1.5, ease: "power2.inOut" })
+                    .to(previousSelector, { x: 0, duration: 1.5, ease: "power2.inOut" }, 0);
             } else {
                 animation
-                    .to(currentSelector, { y: unitValue(-Math.sign(deltaY) * 100, 'vh'), duration: 1, ease: "power2.inOut" })
-                    .to(previousSelector, { y: 0, duration: 1, ease: "power2.inOut" }, 0);
+                    .to(currentSelector, { y: unitValue(-Math.sign(deltaY) * 100, 'vh'), duration: 1.5, ease: "power2.inOut" })
+                    .to(previousSelector, { y: 0, duration: 1.5, ease: "power2.inOut" }, 0);
             }
         }
 
