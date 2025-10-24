@@ -260,6 +260,70 @@ body {
     color: #667eea;
 }
 
+/* Animation Classes */
+.animate-title {
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+.animate-subtitle {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.animate-text {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.animate-button {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+}
+
+.animate-card {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+}
+
+/* Hover Effects */
+.cta-button:hover {
+    background: white;
+    color: #667eea;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.nav-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature:hover,
+.service:hover,
+.contact-item:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Text Animation Effects */
+.banner-title {
+    background: linear-gradient(45deg, #fff, #f0f0f0, #fff);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .banner-content h1 {

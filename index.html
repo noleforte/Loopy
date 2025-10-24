@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=1.3">
+    <link rel="stylesheet" href="style.css?v=2.3">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -19,81 +19,81 @@
 
      <!-- Main Container for GSAP Animations -->
      <div id="main-container">
-    <!-- Banner Section - Full Screen -->
-         <section id="banner" class="banner">
+     <!-- Banner Section - Full Screen -->
+     <section id="banner" class="banner">
         <div class="banner-content">
-            <h1>Welcome to Loopy</h1>
-            <p>Experience the future of web design</p>
-                 <button class="cta-button" onclick="nextSection()">Get Started</button>
+            <h1 class="banner-title animate-title">Welcome to Loopy</h1>
+            <p class="banner-subtitle animate-subtitle">Experience the future of web design</p>
+            <button class="cta-button animate-button" onclick="nextSection()">Get Started</button>
         </div>
-    </section>
+     </section>
 
          <!-- Section 1 - About Us -->
          <section id="section1" class="horizontal-section section-1">
         <div class="section-content">
-            <h2>About Us</h2>
-            <p>We create innovative digital experiences that push the boundaries of what's possible in web design and user interaction.</p>
+            <h2 class="section-heading animate-title">About Us</h2>
+            <p class="section-description animate-text">We create innovative digital experiences that push the boundaries of what's possible in web design and user interaction.</p>
             <div class="features">
-                <div class="feature">
-                    <h3>Innovation</h3>
-                    <p>Cutting-edge solutions for modern problems</p>
+                <div class="feature animate-card" data-delay="0.1">
+                    <h3 class="feature-title">Innovation</h3>
+                    <p class="feature-text">Cutting-edge solutions for modern problems</p>
                 </div>
-                <div class="feature">
-                    <h3>Design</h3>
-                    <p>Beautiful, functional, and user-centered design</p>
+                <div class="feature animate-card" data-delay="0.2">
+                    <h3 class="feature-title">Design</h3>
+                    <p class="feature-text">Beautiful, functional, and user-centered design</p>
                 </div>
-                <div class="feature">
-                    <h3>Technology</h3>
-                    <p>Latest technologies and best practices</p>
+                <div class="feature animate-card" data-delay="0.3">
+                    <h3 class="feature-title">Technology</h3>
+                    <p class="feature-text">Latest technologies and best practices</p>
                 </div>
             </div>
-            <button class="nav-button" onclick="nextSection()">Continue</button>
+            <button class="nav-button animate-button" onclick="nextSection()">Continue</button>
         </div>
     </section>
 
          <!-- Section 2 - Services -->
          <section id="section2" class="horizontal-section section-2">
         <div class="section-content">
-            <h2>Our Services</h2>
-            <p>Comprehensive digital solutions tailored to your needs</p>
+            <h2 class="section-heading animate-title">Our Services</h2>
+            <p class="section-description animate-text">Comprehensive digital solutions tailored to your needs</p>
             <div class="services">
-                <div class="service">
-                    <h3>Web Development</h3>
-                    <p>Custom websites and web applications built with modern technologies</p>
+                <div class="service animate-card" data-delay="0.1">
+                    <h3 class="service-title">Web Development</h3>
+                    <p class="service-text">Custom websites and web applications built with modern technologies</p>
                 </div>
-                <div class="service">
-                    <h3>UI/UX Design</h3>
-                    <p>User-centered design that creates exceptional experiences</p>
+                <div class="service animate-card" data-delay="0.2">
+                    <h3 class="service-title">UI/UX Design</h3>
+                    <p class="service-text">User-centered design that creates exceptional experiences</p>
                 </div>
-                <div class="service">
-                    <h3>Consulting</h3>
-                    <p>Strategic guidance for your digital transformation journey</p>
+                <div class="service animate-card" data-delay="0.3">
+                    <h3 class="service-title">Consulting</h3>
+                    <p class="service-text">Strategic guidance for your digital transformation journey</p>
                 </div>
             </div>
-            <button class="nav-button" onclick="nextSection()">Continue</button>
+            <button class="nav-button animate-button" onclick="nextSection()">Continue</button>
         </div>
     </section>
 
          <!-- Final Section - Contact -->
          <section id="contact" class="final-section">
         <div class="section-content">
-            <h2>Contact Us</h2>
-            <p>Ready to start your next project? Let's talk about how we can help you achieve your goals.</p>
+            <h2 class="section-heading animate-title">Contact Us</h2>
+            <p class="section-description animate-text">Ready to start your next project? Let's talk about how we can help you achieve your goals.</p>
             <div class="contact-info">
-                <div class="contact-item">
-                    <h3>Email</h3>
-                    <p>hello@loopy.com</p>
+                <div class="contact-item animate-card" data-delay="0.1">
+                    <h3 class="contact-title">Email</h3>
+                    <p class="contact-text">hello@loopy.com</p>
                 </div>
-                <div class="contact-item">
-                    <h3>Phone</h3>
-                    <p>+1 (555) 123-4567</p>
+                <div class="contact-item animate-card" data-delay="0.2">
+                    <h3 class="contact-title">Phone</h3>
+                    <p class="contact-text">+1 (555) 123-4567</p>
                 </div>
-                <div class="contact-item">
-                    <h3>Address</h3>
-                    <p>123 Innovation Street, Tech City, TC 12345</p>
+                <div class="contact-item animate-card" data-delay="0.3">
+                    <h3 class="contact-title">Address</h3>
+                    <p class="contact-text">123 Innovation Street, Tech City, TC 12345</p>
                 </div>
             </div>
-            <button class="nav-button" onclick="nextSection()">Back to Start</button>
+            <button class="nav-button animate-button" onclick="nextSection()">Back to Start</button>
         </div>
     </section>
      </div>
@@ -162,6 +162,8 @@
                     positionSections(currentSection);
                     isAnimating = false;
                     updateProgressIndicator();
+                    // Animate new section
+                    setTimeout(() => animateCurrentSection(), 100);
                 }
             });
 
@@ -194,6 +196,8 @@
                     positionSections(currentSection);
                     isAnimating = false;
                     updateProgressIndicator();
+                    // Animate new section
+                    setTimeout(() => animateCurrentSection(), 100);
                 }
             });
 
@@ -286,9 +290,103 @@
             });
         });
 
+        // Animation Functions
+        function initializeAnimations() {
+            // Animate banner on load
+            animateBanner();
+            
+            // Set up section animations
+            setupSectionAnimations();
+        }
+
+        function animateBanner() {
+            const tl = gsap.timeline();
+            
+            tl.to('.banner-title', {
+                opacity: 1,
+                y: 0,
+                duration: 1.2,
+                ease: "power3.out"
+            })
+            .to('.banner-subtitle', {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: "power3.out"
+            }, "-=0.8")
+            .to('.cta-button', {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.8,
+                ease: "back.out(1.7)"
+            }, "-=0.6");
+        }
+
+        function setupSectionAnimations() {
+            // Animate current section
+            animateCurrentSection();
+        }
+
+        function animateCurrentSection() {
+            const currentSectionId = sections[currentSection];
+            const section = document.getElementById(currentSectionId);
+            if (!section) return;
+
+            const tl = gsap.timeline();
+            
+            // Animate title
+            tl.to(section.querySelector('.animate-title'), {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+
+            // Animate description
+            tl.to(section.querySelector('.animate-text'), {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power3.out"
+            }, "-=0.6");
+
+            // Animate cards with stagger
+            const cards = section.querySelectorAll('.animate-card');
+            tl.to(cards, {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.8,
+                ease: "back.out(1.2)",
+                stagger: 0.2
+            }, "-=0.4");
+
+            // Animate button
+            tl.to(section.querySelector('.animate-button'), {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.6,
+                ease: "back.out(1.7)"
+            }, "-=0.2");
+        }
+
+        function resetSectionAnimations() {
+            // Reset all animations
+            gsap.set('.animate-title, .animate-text, .animate-button, .animate-card', {
+                opacity: 0,
+                y: 50,
+                scale: 0.95
+            });
+        }
+
         // Initialize layout and progress indicator
         positionSections(currentSection);
         updateProgressIndicator();
+        
+        // Initialize animations
+        initializeAnimations();
 
 
     </script>
