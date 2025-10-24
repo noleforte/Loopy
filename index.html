@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=2.0">
+    <link rel="stylesheet" href="style.css?v=2.1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -372,102 +372,71 @@
                 return timeline;
             }
 
-            // Get edge positions
+            // Get direction and calculate seamless path
             const fromIndex = underlineState.index;
             const direction = directions[fromIndex];
-            const edgePos = getEdgePosition(fromIndex, index);
-            const oppositeEdgePos = getOppositeEdgePosition(fromIndex, index);
             
             const startCenterX = underlineState.x + underlineState.width / 2;
             const startCenterY = underlineState.y + UNDERLINE_HEIGHT / 2;
             const endCenterX = targetX + targetWidth / 2;
             const endCenterY = targetY + UNDERLINE_HEIGHT / 2;
 
-            // Phase 1: Hide current underline
+            // Create seamless path from current position to target
+            const seamlessPath = createSeamlessPath(startCenterX, startCenterY, endCenterX, endCenterY, direction);
+            
+            // Phase 1: Start brush deformation
             timeline.to(underline, {
-                opacity: 0,
-                duration: 0.3,
+                scaleX: 0.3,
+                scaleY: 0.5,
+                duration: 0.2,
                 ease: "power2.out"
             });
 
-            // Phase 2: Dead loop animation at current position
+            // Phase 2: Create organic path
             timeline.add(() => {
                 syncUnderlineSvg();
-                const loopPath = createDeadLoop(startCenterX, startCenterY, direction);
-                underlinePath.setAttribute('d', loopPath);
+                underlinePath.setAttribute('d', seamlessPath);
                 const pathLength = underlinePath.getTotalLength();
                 underlinePath.style.strokeDasharray = pathLength;
                 underlinePath.style.strokeDashoffset = pathLength;
                 gsap.set(underlinePath, { opacity: 1 });
             });
 
-            timeline.to(underlinePath, {
-                strokeDashoffset: 0,
-                duration: 0.45,
-                ease: "power2.inOut"
+            // Phase 3: Animate along path while deforming
+            const travel = { progress: 0 };
+            timeline.to(travel, {
+                progress: 1,
+                duration: 1.125, // Same as section transition
+                ease: "power2.inOut",
+                onUpdate: () => {
+                    const point = underlinePath.getPointAtLength(underlinePath.getTotalLength() * travel.progress);
+                    const currentWidth = gsap.utils.interpolate(underlineState.width, targetWidth, travel.progress);
+                    const currentScaleX = gsap.utils.interpolate(0.3, 1, travel.progress);
+                    const currentScaleY = gsap.utils.interpolate(0.5, 1, travel.progress);
+                    
+                    gsap.set(underline, {
+                        x: point.x - currentWidth / 2,
+                        y: point.y - UNDERLINE_HEIGHT / 2,
+                        width: currentWidth,
+                        scaleX: currentScaleX,
+                        scaleY: currentScaleY,
+                        opacity: 1
+                    });
+                }
             });
 
-            // Phase 3: Organic path to edge
-            timeline.add(() => {
-                const organicPath = createOrganicPath(startCenterX, startCenterY, edgePos.x, edgePos.y, direction);
-                underlinePath.setAttribute('d', organicPath);
-                const pathLength = underlinePath.getTotalLength();
-                underlinePath.style.strokeDasharray = pathLength;
-                underlinePath.style.strokeDashoffset = 0;
-            });
-
-            timeline.to(underlinePath, {
-                strokeDashoffset: 0,
-                duration: 0.6,
-                ease: "power2.out"
-            });
-
-            // Phase 4: Hide path and show brush at opposite edge
-            timeline.to(underlinePath, {
-                opacity: 0,
-                duration: 0.15,
-                ease: "power2.out"
-            });
-
-            timeline.add(() => {
-                // Position brush at opposite edge
-                gsap.set(underline, {
-                    x: oppositeEdgePos.x - 20,
-                    y: oppositeEdgePos.y - UNDERLINE_HEIGHT / 2,
-                    width: 20,
-                    opacity: 1
-                });
-            });
-
-            // Phase 5: Organic path from opposite edge to target
-            timeline.add(() => {
-                const organicPath = createOrganicPath(oppositeEdgePos.x, oppositeEdgePos.y, endCenterX, endCenterY, direction);
-                underlinePath.setAttribute('d', organicPath);
-                const pathLength = underlinePath.getTotalLength();
-                underlinePath.style.strokeDasharray = pathLength;
-                underlinePath.style.strokeDashoffset = pathLength;
-                gsap.set(underlinePath, { opacity: 1 });
-            });
-
-            timeline.to(underlinePath, {
-                strokeDashoffset: 0,
-                duration: 0.75,
-                ease: "power2.out"
-            });
-
-            // Phase 6: Brush becomes underline
+            // Phase 4: Finalize underline
             timeline.to(underline, {
-                x: targetX,
-                y: targetY,
-                width: targetWidth,
-                duration: 0.45,
+                scaleX: 1,
+                scaleY: 1,
+                duration: 0.1,
                 ease: "power2.out"
             });
 
-            // Phase 7: Hide path
+            // Phase 5: Hide path
             timeline.to(underlinePath, {
                 opacity: 0,
-                duration: 0.3,
+                duration: 0.2,
                 ease: "power2.out"
             });
 
@@ -480,6 +449,33 @@
             });
 
             return timeline;
+        }
+
+        function createSeamlessPath(startX, startY, endX, endY, direction) {
+            const deltaX = endX - startX;
+            const deltaY = endY - startY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            // Create smooth curve based on direction
+            let control1X, control1Y, control2X, control2Y;
+            
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                // Horizontal movement - create horizontal curve
+                const curveHeight = Math.max(40, distance * 0.2);
+                control1X = startX + deltaX * 0.25;
+                control1Y = startY - curveHeight;
+                control2X = startX + deltaX * 0.75;
+                control2Y = endY - curveHeight;
+            } else {
+                // Vertical movement - create vertical curve
+                const curveWidth = Math.max(40, distance * 0.2);
+                control1X = startX - curveWidth;
+                control1Y = startY + deltaY * 0.25;
+                control2X = endX - curveWidth;
+                control2Y = startY + deltaY * 0.75;
+            }
+            
+            return `M ${startX} ${startY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endX} ${endY}`;
         }
 
         const unitValue = (value, unit) => (value === 0 ? 0 : `${value}${unit}`);
