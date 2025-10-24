@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=1.5">
+    <link rel="stylesheet" href="style.css?v=1.6">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -176,6 +176,70 @@
             };
         }
 
+        function getEdgePosition(fromIndex, toIndex) {
+            const direction = directions[fromIndex];
+            const containerRect = container.getBoundingClientRect();
+            const sectionEl = document.getElementById(sections[fromIndex]);
+            const offsetUnitsX = sectionEl ? parseFloat(sectionEl.dataset.offsetX || '0') : 0;
+            const offsetUnitsY = sectionEl ? parseFloat(sectionEl.dataset.offsetY || '0') : 0;
+            const offsetX = offsetUnitsX * window.innerWidth / 100;
+            const offsetY = offsetUnitsY * window.innerHeight / 100;
+            
+            let edgeX, edgeY;
+            
+            if (direction.x > 0) {
+                // Moving right - go to right edge
+                edgeX = containerRect.width - offsetX;
+                edgeY = containerRect.height / 2 - offsetY;
+            } else if (direction.x < 0) {
+                // Moving left - go to left edge
+                edgeX = -offsetX;
+                edgeY = containerRect.height / 2 - offsetY;
+            } else if (direction.y > 0) {
+                // Moving down - go to bottom edge
+                edgeX = containerRect.width / 2 - offsetX;
+                edgeY = containerRect.height - offsetY;
+            } else {
+                // Moving up - go to top edge
+                edgeX = containerRect.width / 2 - offsetX;
+                edgeY = -offsetY;
+            }
+            
+            return { x: edgeX, y: edgeY };
+        }
+
+        function getOppositeEdgePosition(fromIndex, toIndex) {
+            const direction = directions[fromIndex];
+            const containerRect = container.getBoundingClientRect();
+            const sectionEl = document.getElementById(sections[toIndex]);
+            const offsetUnitsX = sectionEl ? parseFloat(sectionEl.dataset.offsetX || '0') : 0;
+            const offsetUnitsY = sectionEl ? parseFloat(sectionEl.dataset.offsetY || '0') : 0;
+            const offsetX = offsetUnitsX * window.innerWidth / 100;
+            const offsetY = offsetUnitsY * window.innerHeight / 100;
+            
+            let edgeX, edgeY;
+            
+            if (direction.x > 0) {
+                // Moving right - appear from left edge
+                edgeX = -offsetX;
+                edgeY = containerRect.height / 2 - offsetY;
+            } else if (direction.x < 0) {
+                // Moving left - appear from right edge
+                edgeX = containerRect.width - offsetX;
+                edgeY = containerRect.height / 2 - offsetY;
+            } else if (direction.y > 0) {
+                // Moving down - appear from top edge
+                edgeX = containerRect.width / 2 - offsetX;
+                edgeY = -offsetY;
+            } else {
+                // Moving up - appear from bottom edge
+                edgeX = containerRect.width / 2 - offsetX;
+                edgeY = containerRect.height - offsetY;
+            }
+            
+            return { x: edgeX, y: edgeY };
+        }
+
         function placeUnderline(index) {
             if (!underline) return;
 
@@ -254,77 +318,48 @@
                 return timeline;
             }
 
+            // Get edge positions
+            const fromIndex = underlineState.index;
+            const edgePos = getEdgePosition(fromIndex, index);
+            const oppositeEdgePos = getOppositeEdgePosition(fromIndex, index);
+            
             const startCenterX = underlineState.x + underlineState.width / 2;
             const startCenterY = underlineState.y + UNDERLINE_HEIGHT / 2;
             const endCenterX = targetX + targetWidth / 2;
             const endCenterY = targetY + UNDERLINE_HEIGHT / 2;
             const startWidth = underlineState.width;
 
-            let pathLength = 0;
+            // Phase 1: Move to edge of current section
+            timeline.to(underline, {
+                x: edgePos.x - startWidth / 2,
+                y: edgePos.y - UNDERLINE_HEIGHT / 2,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+
+            // Phase 2: Hide and move to opposite edge
+            timeline.to(underline, {
+                opacity: 0,
+                duration: 0.1,
+                ease: "power2.out"
+            });
 
             timeline.add(() => {
-                syncUnderlineSvg();
-                
-                // Calculate control point based on direction
-                const deltaX = endCenterX - startCenterX;
-                const deltaY = endCenterY - startCenterY;
-                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                
-                console.log(`Movement: deltaX=${deltaX.toFixed(1)}, deltaY=${deltaY.toFixed(1)}, distance=${distance.toFixed(1)}`);
-                
-                // Determine curve direction based on movement
-                let controlX, controlY;
-                
-                if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                    // Horizontal movement (left/right)
-                    controlX = (startCenterX + endCenterX) / 2;
-                    controlY = Math.min(startCenterY, endCenterY) - Math.max(50, distance * 0.3);
-                    console.log('Horizontal movement - curve up');
-                } else {
-                    // Vertical movement (up/down)
-                    controlX = Math.min(startCenterX, endCenterX) - Math.max(50, distance * 0.3);
-                    controlY = (startCenterY + endCenterY) / 2;
-                    console.log('Vertical movement - curve left');
-                }
-                
-                const pathData = `M ${startCenterX} ${startCenterY} Q ${controlX} ${controlY} ${endCenterX} ${endCenterY}`;
-                underlinePath.setAttribute('d', pathData);
-                pathLength = underlinePath.getTotalLength();
-                underlinePath.style.strokeDasharray = pathLength;
-                underlinePath.style.strokeDashoffset = pathLength;
-            }, 0);
+                gsap.set(underline, {
+                    x: oppositeEdgePos.x - startWidth / 2,
+                    y: oppositeEdgePos.y - UNDERLINE_HEIGHT / 2,
+                    opacity: 1
+                });
+            });
 
-            timeline.to(underlinePath, {
-                strokeDashoffset: 0,
-                opacity: 1,
-                duration: DRAW_DURATION,
+            // Phase 3: Move from opposite edge to target heading
+            timeline.to(underline, {
+                x: targetX,
+                y: targetY,
+                width: targetWidth,
+                duration: 0.4,
                 ease: "power2.out"
-            }, 0);
-
-            timeline.to(underlinePath, {
-                opacity: 0,
-                duration: 0.35,
-                ease: "sine.out"
-            }, DRAW_DURATION - 0.1);
-
-            const travel = { progress: 0 };
-
-            timeline.to(travel, {
-                progress: 1,
-                duration: DRAW_DURATION,
-                ease: "power2.out",
-                onUpdate: () => {
-                    const length = pathLength || underlinePath.getTotalLength();
-                    const point = underlinePath.getPointAtLength(length * travel.progress);
-                    const currentWidth = gsap.utils.interpolate(startWidth, targetWidth, travel.progress);
-                    gsap.set(underline, {
-                        opacity: 1,
-                        x: point.x - currentWidth / 2,
-                        y: point.y - UNDERLINE_HEIGHT / 2,
-                        width: currentWidth
-                    });
-                }
-            }, 0);
+            });
 
             timeline.add(() => {
                 underlineState.x = targetX;
@@ -332,12 +367,6 @@
                 underlineState.width = targetWidth;
                 underlineState.initialized = true;
                 underlineState.index = index;
-                gsap.set(underline, {
-                    x: targetX,
-                    y: targetY,
-                    width: targetWidth,
-                    opacity: 1
-                });
             });
 
             return timeline;
