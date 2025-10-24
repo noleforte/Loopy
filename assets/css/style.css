@@ -5,9 +5,7 @@
     box-sizing: border-box;
 }
 
-html {
-    /* scroll-behavior: smooth; - removed to avoid conflicts with ScrollToPlugin */
-}
+/* html scroll-behavior removed to avoid conflicts with ScrollToPlugin */
 
 body {
     font-family: 'Arial', sans-serif;
@@ -311,23 +309,117 @@ body {
 
 /* Text Animation Effects */
 .banner-title {
-    background: linear-gradient(45deg, #fff, #f0f0f0, #fff);
-    background-size: 200% 200%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: shimmer 3s ease-in-out infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.1em;
 }
 
-@keyframes shimmer {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+/* 3D Hollow Letter Styles */
+.letter-3d {
+    display: inline-block;
+    font-size: 4rem;
+    font-weight: 700;
+    color: transparent;
+    -webkit-text-stroke: 3px #fff;
+    text-stroke: 3px #fff;
+    text-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.8),
+        0 0 20px rgba(255, 255, 255, 0.6),
+        0 0 30px rgba(255, 255, 255, 0.4),
+        0 0 40px rgba(255, 255, 255, 0.2);
+    transform-style: preserve-3d;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    animation: letterAppear 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(50px) rotateX(90deg);
 }
+
+/* 3D Hollow Effect with depth layers */
+.letter-3d::before {
+    content: attr(data-letter);
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.4);
+    text-stroke: 2px rgba(255, 255, 255, 0.4);
+    transform: translateZ(-8px) translateX(2px) translateY(2px);
+    z-index: -1;
+}
+
+.letter-3d::after {
+    content: attr(data-letter);
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+    text-stroke: 1px rgba(255, 255, 255, 0.2);
+    transform: translateZ(-16px) translateX(4px) translateY(4px);
+    z-index: -2;
+}
+
+/* Hover Effects for Hollow Letters */
+.letter-3d:hover {
+    color: transparent;
+    -webkit-text-stroke: 3px #ff6b6b;
+    text-stroke: 3px #ff6b6b;
+    transform: translateY(-10px) rotateX(0deg) scale(1.2);
+    text-shadow: 
+        0 0 20px rgba(255, 107, 107, 0.8),
+        0 0 40px rgba(255, 107, 107, 0.6),
+        0 0 60px rgba(255, 107, 107, 0.4),
+        0 0 80px rgba(255, 107, 107, 0.2);
+    animation: letterHover 0.6s ease-out;
+}
+
+/* Letter appear animation */
+@keyframes letterAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(50px) rotateX(90deg) scale(0.5);
+    }
+    50% {
+        opacity: 0.7;
+        transform: translateY(-10px) rotateX(45deg) scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg) scale(1);
+    }
+}
+
+/* Letter hover animation */
+@keyframes letterHover {
+    0% {
+        transform: translateY(0) rotateX(0deg) scale(1);
+    }
+    50% {
+        transform: translateY(-15px) rotateX(-10deg) scale(1.3);
+    }
+    100% {
+        transform: translateY(-10px) rotateX(0deg) scale(1.2);
+    }
+}
+
+/* Clean title without gradient effect */
+.banner-title {
+    /* Removed gradient effect for cleaner look */
+}
+
+/* Shimmer animation removed */
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .banner-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .letter-3d {
         font-size: 2.5rem;
     }
     
@@ -349,5 +441,15 @@ body {
     .contact-info {
         grid-template-columns: 1fr;
         gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .letter-3d {
+        font-size: 2rem;
+    }
+    
+    .banner-title {
+        gap: 0.05em;
     }
 }

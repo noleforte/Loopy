@@ -1,5 +1,19 @@
 {
+  "name": "loopy",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
   "dependencies": {
-    "gsap": "^3.13.0"
+    "gsap": "^3.13.0",
+    "nuxt": "^4.1.3",
+    "pinia": "^3.0.3"
+  },
+  "devDependencies": {
+    "@pinia/nuxt": "^0.5.5"
   }
 }

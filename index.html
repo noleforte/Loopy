@@ -22,7 +22,7 @@
      <!-- Banner Section - Full Screen -->
      <section id="banner" class="banner">
         <div class="banner-content">
-            <h1 class="banner-title animate-title">Welcome to Loopy</h1>
+            <h1 class="banner-title animate-title" id="banner-title">Loopy</h1>
             <p class="banner-subtitle animate-subtitle">Experience the future of web design</p>
             <button class="cta-button animate-button" onclick="nextSection()">Get Started</button>
         </div>
@@ -302,18 +302,22 @@
         function animateBanner() {
             const tl = gsap.timeline();
             
-            tl.to('.banner-title', {
+            // Animate individual letters
+            tl.to('.letter-3d', {
                 opacity: 1,
                 y: 0,
-                duration: 1.2,
-                ease: "power3.out"
+                rotateX: 0,
+                scale: 1,
+                duration: 0.8,
+                ease: "back.out(1.7)",
+                stagger: 0.1
             })
             .to('.banner-subtitle', {
                 opacity: 1,
                 y: 0,
                 duration: 1,
                 ease: "power3.out"
-            }, "-=0.8")
+            }, "-=0.4")
             .to('.cta-button', {
                 opacity: 1,
                 y: 0,
@@ -387,6 +391,14 @@
                 y: 50,
                 scale: 0.95
             });
+            
+            // Reset letter animations
+            gsap.set('.letter-3d', {
+                opacity: 0,
+                y: 50,
+                rotateX: 90,
+                scale: 0.5
+            });
         }
 
         // Initialize layout and progress indicator
@@ -395,6 +407,41 @@
         
         // Initialize animations
         initializeAnimations();
+
+        // 3D Letter Animation Setup
+        function setupLetterAnimation() {
+            const title = document.getElementById('banner-title');
+            if (!title) return;
+            
+            const text = title.textContent;
+            title.innerHTML = '';
+            
+            // Split text into letters and spaces
+            const letters = text.split('');
+            
+            letters.forEach((char, index) => {
+                const span = document.createElement('span');
+                const displayChar = char === ' ' ? '\u00A0' : char; // Non-breaking space for spaces
+                span.textContent = displayChar;
+                span.className = 'letter-3d';
+                span.setAttribute('data-letter', displayChar);
+                span.style.animationDelay = `${index * 0.1}s`;
+                
+                // Add hover event listener for additional effects
+                span.addEventListener('mouseenter', function() {
+                    this.style.zIndex = '10';
+                });
+                
+                span.addEventListener('mouseleave', function() {
+                    this.style.zIndex = '1';
+                });
+                
+                title.appendChild(span);
+            });
+        }
+
+        // Call setup after DOM is loaded
+        document.addEventListener('DOMContentLoaded', setupLetterAnimation);
 
 
     </script>
