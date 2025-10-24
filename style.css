@@ -76,6 +76,30 @@ body {
     transform: translateY(-2px);
 }
 
+/* Split text helpers for GSAP animations */
+.animate-title,
+.animate-subtitle,
+.animate-text {
+    position: relative;
+}
+
+.split-word-container {
+    display: inline-block;
+    overflow: hidden;
+    padding: 0 0.02em;
+    vertical-align: top;
+}
+
+.split-word {
+    display: inline-block;
+    will-change: transform, opacity;
+}
+
+.split-char {
+    display: inline-block;
+    will-change: transform, opacity;
+}
+
 /* Horizontal Scrolling Sections */
 .horizontal-section {
     width: 100vw;

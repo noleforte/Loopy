@@ -127,6 +127,103 @@
 
         const unitValue = (value, unit) => (value === 0 ? 0 : `${value}${unit}`);
 
+        function splitTextElement(element) {
+            if (!element) return null;
+            if (element.dataset.split === 'true' && element.__splitText) {
+                return element.__splitText;
+            }
+
+            const text = element.textContent.replace(/\s+/g, ' ').trim();
+            element.textContent = '';
+
+            const words = [];
+            const chars = [];
+
+            text.split(' ').forEach((word, index, array) => {
+                if (!word) return;
+
+                const container = document.createElement('span');
+                container.classList.add('split-word-container');
+
+                const wordSpan = document.createElement('span');
+                wordSpan.classList.add('split-word');
+                container.appendChild(wordSpan);
+
+                word.split('').forEach((character) => {
+                    const charSpan = document.createElement('span');
+                    charSpan.classList.add('split-char');
+                    charSpan.textContent = character;
+                    wordSpan.appendChild(charSpan);
+                    chars.push(charSpan);
+                });
+
+                words.push(wordSpan);
+                element.appendChild(container);
+
+                if (index < array.length - 1) {
+                    element.appendChild(document.createTextNode(' '));
+                }
+            });
+
+            element.dataset.split = 'true';
+            element.__splitText = { words, chars };
+            return element.__splitText;
+        }
+
+        function prepareSectionForAnimation(section) {
+            if (!section) return;
+
+            const title = section.querySelector('.animate-title');
+            if (title) {
+                const split = splitTextElement(title);
+                if (split) {
+                    gsap.set(title, { perspective: 800 });
+                    gsap.set(split.chars, {
+                        yPercent: 120,
+                        rotateX: -80,
+                        opacity: 0,
+                        transformOrigin: '50% 100%'
+                    });
+                }
+            }
+
+            const detailTexts = section.querySelectorAll('.animate-subtitle, .animate-text');
+            detailTexts.forEach((element) => {
+                const split = splitTextElement(element);
+                if (!split) return;
+                gsap.set(split.words, {
+                    yPercent: 110,
+                    opacity: 0,
+                    skewY: 6
+                });
+            });
+
+            const cards = section.querySelectorAll('.animate-card');
+            if (cards.length) {
+                gsap.set(cards, {
+                    opacity: 0,
+                    y: 60,
+                    scale: 0.95,
+                    rotateX: 8
+                });
+            }
+
+            const buttons = section.querySelectorAll('.animate-button');
+            if (buttons.length) {
+                gsap.set(buttons, {
+                    opacity: 0,
+                    y: 40,
+                    scale: 0.9
+                });
+            }
+        }
+
+        function prepareTextAnimations() {
+            document.querySelectorAll('.animate-title, .animate-subtitle, .animate-text').forEach((element) => {
+                splitTextElement(element);
+            });
+        }
+
         function positionSections(centerIndex) {
             let offsetX = 0;
             let offsetY = 0;
@@ -155,6 +252,8 @@
             const direction = directions[currentSection];
             const currentSelector = `#${sections[currentSection]}`;
             const nextSelector = `#${sections[nextIndex]}`;
+
+            prepareSectionForAnimation(document.getElementById(sections[nextIndex]));
 
             const animation = gsap.timeline({
                 onComplete: () => {
@@ -189,6 +288,8 @@
             const deltaY = -direction.y;
             const currentSelector = `#${sections[currentSection]}`;
             const previousSelector = `#${sections[previousIndex]}`;
+
+            prepareSectionForAnimation(document.getElementById(sections[previousIndex]));
 
             const animation = gsap.timeline({
                 onComplete: () => {
@@ -292,40 +393,52 @@
 
         // Animation Functions
         function initializeAnimations() {
-            // Animate banner on load
+            prepareTextAnimations();
+            sections.forEach((id) => {
+                const section = document.getElementById(id);
+                prepareSectionForAnimation(section);
+            });
             animateBanner();
-            
-            // Set up section animations
-            setupSectionAnimations();
         }
 
         function animateBanner() {
-            const tl = gsap.timeline();
-            
-            tl.to('.banner-title', {
-                opacity: 1,
-                y: 0,
-                duration: 1.2,
-                ease: "power3.out"
-            })
-            .to('.banner-subtitle', {
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                ease: "power3.out"
-            }, "-=0.8")
-            .to('.cta-button', {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: 0.8,
-                ease: "back.out(1.7)"
-            }, "-=0.6");
-        }
+            const banner = document.getElementById('banner');
+            if (!banner) return;
 
-        function setupSectionAnimations() {
-            // Animate current section
-            animateCurrentSection();
+            const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+            const titleSplit = splitTextElement(banner.querySelector('.animate-title'));
+            if (titleSplit && titleSplit.chars.length) {
+                tl.to(titleSplit.chars, {
+                    yPercent: 0,
+                    rotateX: 0,
+                    opacity: 1,
+                    duration: 1.2,
+                    stagger: { each: 0.045, from: 'start' }
+                });
+            }
+
+            const subtitleSplit = splitTextElement(banner.querySelector('.animate-subtitle'));
+            if (subtitleSplit && subtitleSplit.words.length) {
+                tl.to(subtitleSplit.words, {
+                    yPercent: 0,
+                    opacity: 1,
+                    skewY: 0,
+                    duration: 1,
+                    stagger: 0.08
+                }, "-=0.8");
+            }
+
+            const button = banner.querySelector('.animate-button');
+            if (button) {
+                tl.to(button, {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.8,
+                    ease: "back.out(1.7)"
+                }, "-=0.5");
+            }
         }
 
         function animateCurrentSection() {
@@ -333,59 +446,49 @@
             const section = document.getElementById(currentSectionId);
             if (!section) return;
 
-            const tl = gsap.timeline();
-            
-            // Animate title
-            tl.to(section.querySelector('.animate-title'), {
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                ease: "power3.out"
-            });
-
-            // Animate description with special effect
-            const description = section.querySelector('.animate-text');
-            if (description) {
-                tl.to(description, {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.8,
-                    ease: "power3.out"
-                }, "-=0.6");
-                
-                // Add typewriter effect for description
-                if (description.classList.contains('section-description')) {
-                    const text = description.textContent;
-                    description.textContent = '';
-                    description.style.borderRight = '2px solid rgba(255, 255, 255, 0.7)';
-                    
-                    tl.to({}, {
-                        duration: 0.05,
-                        repeat: text.length - 1,
-                        onRepeat: function() {
-                            description.textContent = text.substring(0, this.repeat() + 1);
-                        },
-                        onComplete: function() {
-                            description.style.borderRight = 'none';
-                        }
-                    }, "-=0.4");
-                }
+            if (currentSectionId === 'banner') {
+                animateBanner();
+                return;
             }
 
-            // Animate cards with stagger
+            const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+            const titleSplit = splitTextElement(section.querySelector('.animate-title'));
+            if (titleSplit && titleSplit.chars.length) {
+                tl.to(titleSplit.chars, {
+                    yPercent: 0,
+                    rotateX: 0,
+                    opacity: 1,
+                    duration: 1,
+                    stagger: { each: 0.045, from: 'start' }
+                });
+            }
+
+            const textElements = section.querySelectorAll('.animate-text');
+            textElements.forEach((element) => {
+                const split = splitTextElement(element);
+                if (!split || !split.words.length) return;
+                tl.to(split.words, {
+                    yPercent: 0,
+                    opacity: 1,
+                    skewY: 0,
+                    duration: 0.9,
+                    stagger: 0.08
+                }, "-=0.6");
+            });
+
             const cards = section.querySelectorAll('.animate-card');
-            if (cards.length > 0) {
+            if (cards.length) {
                 tl.to(cards, {
                     opacity: 1,
                     y: 0,
                     scale: 1,
-                    duration: 0.8,
-                    ease: "back.out(1.2)",
-                    stagger: 0.2
-                }, "-=0.4");
+                    rotateX: 0,
+                    duration: 0.9,
+                    stagger: { each: 0.15, from: 'center' }
+                }, "-=0.5");
             }
 
-            // Animate button
             const button = section.querySelector('.animate-button');
             if (button) {
                 tl.to(button, {
@@ -394,23 +497,14 @@
                     scale: 1,
                     duration: 0.6,
                     ease: "back.out(1.7)"
-                }, "-=0.2");
+                }, "-=0.3");
             }
-        }
-
-        function resetSectionAnimations() {
-            // Reset all animations
-            gsap.set('.animate-title, .animate-text, .animate-button, .animate-card', {
-                opacity: 0,
-                y: 50,
-                scale: 0.95
-            });
         }
 
         // Initialize layout and progress indicator
         positionSections(currentSection);
         updateProgressIndicator();
-        
+
         // Initialize animations
         initializeAnimations();
 
