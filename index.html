@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=2.1">
+    <link rel="stylesheet" href="style.css?v=2.2">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -116,8 +116,13 @@
 
      <!-- GSAP Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js" integrity="sha512-gmwBmiTVER57N3jYS3LinA9eb8aHrJua5iQD7yqYCKa5x6Jjc7VDVaEA0je0Lu0bP9j7tEjV3+1qUm6loO99Kw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/ScrollSmoother.min.js"></script>
     
     <script>
+        // Register GSAP plugins
+        gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+        
         // GSAP Square Navigation System
         let currentSection = 0;
         const sections = ['banner', 'section1', 'section2', 'contact'];
@@ -137,6 +142,9 @@
         const UNDERLINE_HEIGHT = 4;
         const UNDERLINE_OFFSET = 2;
         const DRAW_DURATION = 0.95;
+        
+        // ScrollSmoother instance
+        let scrollSmoother;
 
         if (underline) {
             gsap.set(underline, { x: 0, y: 0, width: 0, opacity: 0, scaleX: 1, transformOrigin: "left center" });
@@ -340,115 +348,47 @@
             return loopPath;
         }
 
-        function animateUnderlineTo(index) {
-            const timeline = gsap.timeline();
+        function createScrollFollowingUnderline() {
+            if (!underline) return;
 
-            if (!underline || !underlinePath) {
-                console.log('Underline elements not found');
-                return timeline;
-            }
+            // Create ScrollTrigger for each section
+            sections.forEach((sectionId, index) => {
+                const section = document.getElementById(sectionId);
+                if (!section) return;
 
-            if (underlineState.index === index && underlineState.initialized) {
-                console.log(`Underline already at section ${index}`);
-                return timeline;
-            }
+                const targetSpan = getHeadingSpan(index);
+                if (!targetSpan) return;
 
-            const targetSpan = getHeadingSpan(index);
-
-            if (!targetSpan) {
-                console.log(`No target span found for section ${index}`);
-                timeline.to(underline, { opacity: 0, duration: 0.3, ease: "power2.out" });
-                underlineState.initialized = false;
-                underlineState.index = index;
-                return timeline;
-            }
-
-            console.log(`Animating underline from section ${underlineState.index} to section ${index}`);
-
-            const { x: targetX, y: targetY, width: targetWidth } = getUnderlineMetrics(index, targetSpan);
-
-            if (!underlineState.initialized) {
-                placeUnderline(index);
-                return timeline;
-            }
-
-            // Get direction and calculate seamless path
-            const fromIndex = underlineState.index;
-            const direction = directions[fromIndex];
-            
-            const startCenterX = underlineState.x + underlineState.width / 2;
-            const startCenterY = underlineState.y + UNDERLINE_HEIGHT / 2;
-            const endCenterX = targetX + targetWidth / 2;
-            const endCenterY = targetY + UNDERLINE_HEIGHT / 2;
-
-            // Create seamless path from current position to target
-            const seamlessPath = createSeamlessPath(startCenterX, startCenterY, endCenterX, endCenterY, direction);
-            
-            // Phase 1: Start brush deformation
-            timeline.to(underline, {
-                scaleX: 0.3,
-                scaleY: 0.5,
-                duration: 0.2,
-                ease: "power2.out"
+                ScrollTrigger.create({
+                    trigger: section,
+                    start: "top center",
+                    end: "bottom center",
+                    scrub: 0.7, // Smooth following like the circle example
+                    onUpdate: (self) => {
+                        const { x, y, width } = getUnderlineMetrics(index, targetSpan);
+                        
+                        // Smooth interpolation based on scroll progress
+                        const progress = self.progress;
+                        const currentWidth = gsap.utils.interpolate(0, width, progress);
+                        const currentOpacity = gsap.utils.interpolate(0, 1, progress);
+                        
+                        gsap.set(underline, {
+                            x: x,
+                            y: y,
+                            width: currentWidth,
+                            opacity: currentOpacity,
+                            scaleX: 1,
+                            scaleY: 1
+                        });
+                        
+                        underlineState.x = x;
+                        underlineState.y = y;
+                        underlineState.width = width;
+                        underlineState.initialized = true;
+                        underlineState.index = index;
+                    }
+                });
             });
-
-            // Phase 2: Create organic path
-            timeline.add(() => {
-                syncUnderlineSvg();
-                underlinePath.setAttribute('d', seamlessPath);
-                const pathLength = underlinePath.getTotalLength();
-                underlinePath.style.strokeDasharray = pathLength;
-                underlinePath.style.strokeDashoffset = pathLength;
-                gsap.set(underlinePath, { opacity: 1 });
-            });
-
-            // Phase 3: Animate along path while deforming
-            const travel = { progress: 0 };
-            timeline.to(travel, {
-                progress: 1,
-                duration: 1.125, // Same as section transition
-                ease: "power2.inOut",
-                onUpdate: () => {
-                    const point = underlinePath.getPointAtLength(underlinePath.getTotalLength() * travel.progress);
-                    const currentWidth = gsap.utils.interpolate(underlineState.width, targetWidth, travel.progress);
-                    const currentScaleX = gsap.utils.interpolate(0.3, 1, travel.progress);
-                    const currentScaleY = gsap.utils.interpolate(0.5, 1, travel.progress);
-                    
-                    gsap.set(underline, {
-                        x: point.x - currentWidth / 2,
-                        y: point.y - UNDERLINE_HEIGHT / 2,
-                        width: currentWidth,
-                        scaleX: currentScaleX,
-                        scaleY: currentScaleY,
-                        opacity: 1
-                    });
-                }
-            });
-
-            // Phase 4: Finalize underline
-            timeline.to(underline, {
-                scaleX: 1,
-                scaleY: 1,
-                duration: 0.1,
-                ease: "power2.out"
-            });
-
-            // Phase 5: Hide path
-            timeline.to(underlinePath, {
-                opacity: 0,
-                duration: 0.2,
-                ease: "power2.out"
-            });
-
-            timeline.add(() => {
-                underlineState.x = targetX;
-                underlineState.y = targetY;
-                underlineState.width = targetWidth;
-                underlineState.initialized = true;
-                underlineState.index = index;
-            });
-
-            return timeline;
         }
 
         function createSeamlessPath(startX, startY, endX, endY, direction) {
@@ -670,19 +610,27 @@
             });
         });
 
+        // Initialize ScrollSmoother
+        scrollSmoother = ScrollSmoother.create({
+            content: "#main-container",
+            wrapper: "body",
+            smooth: 1,
+            effects: false
+        });
+
         // Initialize layout and progress indicator
         positionSections(currentSection);
         updateProgressIndicator();
         
-        // Initialize underline after a short delay to ensure DOM is ready
+        // Initialize scroll-following underline
         setTimeout(() => {
-            placeUnderline(currentSection);
+            createScrollFollowingUnderline();
         }, 100);
 
         window.addEventListener('resize', () => {
             positionSections(currentSection);
             syncUnderlineSvg();
-            placeUnderline(currentSection);
+            ScrollTrigger.refresh();
         });
     </script>
 </body>
