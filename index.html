@@ -31,7 +31,7 @@
          <!-- Section 1 - About Us -->
          <section id="section1" class="horizontal-section section-1">
         <div class="section-content">
-            <h2>About Us</h2>
+            <h2 class="section-title"><span>About Us</span></h2>
             <p>We create innovative digital experiences that push the boundaries of what's possible in web design and user interaction.</p>
             <div class="features">
                 <div class="feature">
@@ -54,7 +54,7 @@
          <!-- Section 2 - Services -->
          <section id="section2" class="horizontal-section section-2">
         <div class="section-content">
-            <h2>Our Services</h2>
+            <h2 class="section-title"><span>Our Services</span></h2>
             <p>Comprehensive digital solutions tailored to your needs</p>
             <div class="services">
                 <div class="service">
@@ -77,7 +77,7 @@
          <!-- Final Section - Contact -->
          <section id="contact" class="final-section">
         <div class="section-content">
-            <h2>Contact Us</h2>
+            <h2 class="section-title"><span>Contact Us</span></h2>
             <p>Ready to start your next project? Let's talk about how we can help you achieve your goals.</p>
             <div class="contact-info">
                 <div class="contact-item">
@@ -96,6 +96,7 @@
             <button class="nav-button" onclick="nextSection()">Back to Start</button>
         </div>
     </section>
+        <div class="section-underline"></div>
      </div>
 
     <!-- Footer -->
@@ -124,6 +125,37 @@
             { x: 0, y: -100 }   // contact -> banner (up)
         ];
         let isAnimating = false;
+        const container = document.querySelector('#main-container');
+        const underline = document.querySelector('.section-underline');
+
+        if (underline) {
+            gsap.set(underline, { x: 0, y: 0, width: 0, opacity: 0 });
+        }
+
+        function moveUnderline(targetIndex = currentSection) {
+            if (!underline) return;
+
+            const targetHeading = document.querySelector(`#${sections[targetIndex]} .section-title span`);
+
+            if (!targetHeading) {
+                gsap.to(underline, { opacity: 0, duration: 0.3, ease: "power2.out" });
+                return;
+            }
+
+            const headingRect = targetHeading.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            const targetX = headingRect.left - containerRect.left;
+            const targetY = headingRect.bottom - containerRect.top + 8;
+
+            gsap.to(underline, {
+                duration: 0.6,
+                x: targetX,
+                y: targetY,
+                width: headingRect.width,
+                opacity: 1,
+                ease: "power3.out"
+            });
+        }
 
         const unitValue = (value, unit) => (value === 0 ? 0 : `${value}${unit}`);
 
@@ -161,6 +193,7 @@
                     currentSection = nextIndex;
                     positionSections(currentSection);
                     isAnimating = false;
+                    moveUnderline(currentSection);
                     updateProgressIndicator();
                 }
             });
@@ -193,6 +226,7 @@
                     currentSection = previousIndex;
                     positionSections(currentSection);
                     isAnimating = false;
+                    moveUnderline(currentSection);
                     updateProgressIndicator();
                 }
             });
@@ -289,8 +323,9 @@
         // Initialize layout and progress indicator
         positionSections(currentSection);
         updateProgressIndicator();
+        moveUnderline(currentSection);
 
-
+        window.addEventListener('resize', () => moveUnderline(currentSection));
     </script>
 </body>
 </html>
