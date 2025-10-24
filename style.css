@@ -34,7 +34,9 @@ body {
 .banner {
     height: 100vh;
     width: 100vw;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: url(media/Layers1/pic_1.png);
+    background-size: cover;
+    background-position: center;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -85,15 +87,21 @@ body {
 }
 
 .section-1 {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: url(media/Layers1/pic_2.png);
+    background-size: cover;
+    background-position: center;
 }
 
 .section-2 {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: url(media/Layers1/pic_3.png);
+    background-size: cover;
+    background-position: center;
 }
 
 .section-3 {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: url(media/Layers1/pic_4.png);
+    background-size: cover;
+    background-position: center;
 }
 
 .section-content {
@@ -182,7 +190,9 @@ body {
 .final-section {
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    background: url(media/Layers1/pic_4.png);
+    background-size: cover;
+    background-position: center;
     display: flex;
     align-items: center;
     justify-content: center;
