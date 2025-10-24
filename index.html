@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loopy</title>
-    <link rel="stylesheet" href="style.css?v=2.6">
+    <link rel="stylesheet" href="style.css?v=2.7">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
 </head>
@@ -335,7 +335,7 @@
 
             const tl = gsap.timeline();
             
-            // Animate title
+            // Animate title and description together (like animate-title)
             tl.to(section.querySelector('.animate-title'), {
                 opacity: 1,
                 y: 0,
@@ -343,7 +343,6 @@
                 ease: "power3.out"
             });
 
-            // Animate description (like animate-title)
             const description = section.querySelector('.section-description');
             if (description) {
                 tl.to(description, {
@@ -351,7 +350,7 @@
                     y: 0,
                     duration: 1,
                     ease: "power3.out"
-                }, "-=0.6");
+                }, "-=0.8"); // Start almost together with title
             }
 
             // Animate cards with stagger
