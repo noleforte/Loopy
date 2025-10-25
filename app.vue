@@ -13,21 +13,6 @@
       <!-- Banner Section - Full Screen -->
       <section id="banner" class="banner">
         <div class="banner-content">
-          <!-- Interactive Elements Container -->
-          <div class="interactive-elements">
-            <div class="bouncing-circle circle-1"></div>
-            <div class="bouncing-circle circle-2"></div>
-            <div class="bouncing-circle circle-3"></div>
-            <div class="floating-square square-1"></div>
-            <div class="floating-square square-2"></div>
-            
-            <!-- Deformed Elements -->
-            <div class="deformed-triangle triangle-1"></div>
-            <div class="deformed-hexagon hexagon-1"></div>
-            <div class="deformed-wave wave-1"></div>
-            <div class="deformed-blob blob-1"></div>
-          </div>
-          
           <h1 class="banner-title animate-title" id="banner-title">Loopy</h1>
           <p class="banner-subtitle animate-subtitle">Experience the future of web design</p>
           
