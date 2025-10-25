@@ -123,11 +123,11 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
 
-// Import images
-import pic1 from '~/public/media/Layers1/pic_1.png'
-import pic2 from '~/public/media/Layers1/pic_2.png'
-import pic3 from '~/public/media/Layers1/pic_3.png'
-import pic4 from '~/public/media/Layers1/pic_4.png'
+// Static image paths - no imports needed for public assets
+const pic1 = '/media/Layers1/pic_1.png'
+const pic2 = '/media/Layers1/pic_2.png'
+const pic3 = '/media/Layers1/pic_3.png'
+const pic4 = '/media/Layers1/pic_4.png'
 
 // Global head configuration
 useHead({
