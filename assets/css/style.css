@@ -32,7 +32,7 @@ body {
 .banner {
     height: 100vh;
     width: 100vw;
-    background: url(media/Layers1/pic_4.png);
+    background: url(/media/Layers1/pic_4.png);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -86,21 +86,21 @@ body {
 }
 
 .section-1 {
-    background: url(media/Layers1/pic_3.png);
+    background: url(/media/Layers1/pic_3.png);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
 .section-2 {
-    background: url(media/Layers1/pic_2.png);
+    background: url(/media/Layers1/pic_2.png);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
 .section-3 {
-    background: url(media/Layers1/pic_1.png);
+    background: url(/media/Layers1/pic_1.png);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -192,7 +192,7 @@ body {
 .final-section {
     width: 100vw;
     height: 100vh;
-    background: url(media/Layers1/pic_1.png);
+    background: url(/media/Layers1/pic_1.png);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

@@ -13,16 +13,22 @@
       <!-- Banner Section - Full Screen -->
       <section id="banner" class="banner">
         <div class="banner-content">
-          <h1 class="banner-title animate-title" id="banner-title">Loopy</h1>
+          <h1 class="banner-title animate-title" id="banner-title">
+            <span class="letter-3d">L</span>
+            <span class="letter-3d">o</span>
+            <span class="letter-3d">o</span>
+            <span class="letter-3d">p</span>
+            <span class="letter-3d">y</span>
+          </h1>
           <p class="banner-subtitle animate-subtitle">Experience the future of web design</p>
           
           <!-- Ponpon-style buttons -->
           <div class="ponpon-buttons">
-            <button class="ponpon-btn btn-primary" @click="nextSection">
+            <button class="ponpon-btn btn-primary cta-button" @click="nextSection">
               <span class="btn-text">Get Started</span>
               <div class="btn-bg"></div>
             </button>
-            <button class="ponpon-btn btn-secondary" @click="playAnimation">
+            <button class="ponpon-btn btn-secondary cta-button" @click="playAnimation">
               <span class="btn-text">Play</span>
               <div class="btn-bg"></div>
             </button>
@@ -510,7 +516,7 @@ onMounted(() => {
     setupLetterAnimation()
     
     // Add event listeners
-    document.addEventListener('wheel', handleWheel)
+    document.addEventListener('wheel', handleWheel, { passive: false })
     document.addEventListener('keydown', handleKeydown)
     
     // Add progress dot click handlers
@@ -562,11 +568,12 @@ onUnmounted(() => {
 
 /* Make sure letters are visible */
 .letter-3d {
-  opacity: 1 !important;
-  transform: none !important;
+  opacity: 0;
+  transform: translateY(50px) rotateX(-90deg) scale(0.5);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   display: inline-block;
+  margin: 0 2px;
 }
 
 .letter-3d:hover {
