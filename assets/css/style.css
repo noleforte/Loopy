@@ -1,15 +1,9 @@
-/* Import images */
-@import url('~/assets/images/pic_1.png');
-@import url('~/assets/images/pic_2.png');
-@import url('~/assets/images/pic_3.png');
-@import url('~/assets/images/pic_4.png');
-
 /* CSS Variables for assets */
 :root {
-  --pic-1: url('~/assets/images/pic_1.png');
-  --pic-2: url('~/assets/images/pic_2.png');
-  --pic-3: url('~/assets/images/pic_3.png');
-  --pic-4: url('~/assets/images/pic_4.png');
+  --pic-1: url('/media/Layers1/pic_1.png');
+  --pic-2: url('/media/Layers1/pic_2.png');
+  --pic-3: url('/media/Layers1/pic_3.png');
+  --pic-4: url('/media/Layers1/pic_4.png');
 }
 
 /* Reset and Base Styles */
