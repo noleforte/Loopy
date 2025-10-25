@@ -1,9 +1,9 @@
 /* CSS Variables for assets - will be set dynamically */
 :root {
-  --pic-1: url('/media/Layers1/pic_1.png');
-  --pic-2: url('/media/Layers1/pic_2.png');
-  --pic-3: url('/media/Layers1/pic_3.png');
-  --pic-4: url('/media/Layers1/pic_4.png');
+  --pic-1: url('/media/Layers1/pic_1.svg');
+  --pic-2: url('/media/Layers1/pic_2.svg');
+  --pic-3: url('/media/Layers1/pic_3.svg');
+  --pic-4: url('/media/Layers1/pic_4.svg');
 }
 
 /* Reset and Base Styles */

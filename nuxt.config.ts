@@ -34,7 +34,7 @@ export default defineNuxtConfig({
         { name: 'description', content: 'Experience the future of web design with Loopy' }
       ],
       link: [
-        { rel: 'icon', type: 'image/png', href: '/media/favicon.png' }
+        { rel: 'icon', type: 'image/svg+xml', href: '/media/favicon.svg' }
       ],
       script: [
         {
