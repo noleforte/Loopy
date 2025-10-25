@@ -34,11 +34,31 @@
       <!-- Banner Section - Full Screen -->
       <section id="banner" class="banner">
         <div class="banner-content">
-          <!-- Container with v4.svg as background -->
-          <div class="banner-bg-outer" style="background-image: url('/media/v4.svg');">
-            <!-- Inner image placed inside the v4.svg container -->
-            <img src="/media/pic_1_bg_inner.png" alt="Background" class="banner-bg-inner" />
-          </div>
+          <ClientOnly>
+            <template #fallback>
+              <div class="banner-jelly banner-jelly-fallback">
+                <img src="/media/v4.svg" alt="Loopy shape" class="banner-jelly-fallback-shape" />
+                <span class="banner-jelly-initial">L</span>
+              </div>
+            </template>
+            <JellyBlob
+              class="banner-jelly"
+              path-src="/media/v4.svg"
+              image="/media/pic_1_bg_inner.png"
+              :width="520"
+              :height="360"
+              color="#5C1523"
+              border-color="#8A2433"
+              :border-width="6"
+              :points-number="26"
+              :max-distance="110"
+              :mouse-incidence="55"
+              :max-incidence="70"
+              :shake-limit="8"
+            >
+              <span class="banner-jelly-initial">L</span>
+            </JellyBlob>
+          </ClientOnly>
         </div>
       </section>
 
@@ -590,64 +610,51 @@ onUnmounted(() => {
   height: 100%;
 }
 
-/* Banner images styling */
-.banner-bg-outer {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+/* Jelly banner styling */
+.banner-jelly {
+  cursor: grab;
+  filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.25));
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.banner-jelly:active {
+  cursor: grabbing;
+}
+
+.banner-jelly:hover {
+  filter: drop-shadow(0 24px 55px rgba(92, 21, 35, 0.45));
+}
+
+.banner-jelly :deep(.centroid-text) {
+  text-transform: uppercase;
+  letter-spacing: 0.4rem;
+  text-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.banner-jelly-initial {
+  display: inline-block;
+  font-size: clamp(3rem, 12vw, 7rem);
+  font-weight: 800;
+}
+
+.banner-jelly-fallback {
+  position: relative;
+  width: min(520px, 90vw);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
 }
 
-.banner-bg-outer:hover {
-  filter: url(#magneticDistortion);
-  animation: magneticDistortion 0.8s ease-in-out;
-  clip-path: polygon(0% 0%, 100% 0%, 95% 20%, 100% 40%, 90% 60%, 100% 80%, 95% 100%, 0% 100%, 5% 80%, 0% 60%, 10% 40%, 0% 20%);
-}
-
-@keyframes magneticDistortion {
-  0% {
-    filter: url(#magneticDistortion);
-    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
-  }
-  25% {
-    filter: url(#magneticDistortion);
-    clip-path: polygon(0% 0%, 100% 0%, 90% 15%, 100% 35%, 85% 55%, 100% 75%, 90% 100%, 0% 100%, 10% 85%, 0% 65%, 15% 45%, 0% 25%);
-  }
-  50% {
-    filter: url(#magneticDistortion);
-    clip-path: polygon(0% 0%, 100% 0%, 85% 10%, 100% 30%, 80% 50%, 100% 70%, 85% 100%, 0% 100%, 15% 90%, 0% 70%, 20% 50%, 0% 30%);
-  }
-  75% {
-    filter: url(#magneticDistortion);
-    clip-path: polygon(0% 0%, 100% 0%, 90% 15%, 100% 35%, 85% 55%, 100% 75%, 90% 100%, 0% 100%, 10% 85%, 0% 65%, 15% 45%, 0% 25%);
-  }
-  100% {
-    filter: url(#magneticDistortion);
-    clip-path: polygon(0% 0%, 100% 0%, 95% 20%, 100% 40%, 90% 60%, 100% 80%, 95% 100%, 0% 100%, 5% 80%, 0% 60%, 10% 40%, 0% 20%);
-  }
-}
-
-.banner-bg-inner {
-  max-width: 60%;
-  max-height: 60%;
-  width: auto;
+.banner-jelly-fallback-shape {
+  width: 100%;
   height: auto;
-  object-fit: contain;
-  position: relative;
-  z-index: 1;
-  margin: auto;
+  filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.25));
 }
+
+.banner-jelly-fallback .banner-jelly-initial {
+  position: absolute;
+}
+
 
 /* Make sure letters are visible */
 .letter-3d {
