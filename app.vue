@@ -35,7 +35,7 @@
       <section id="banner" class="banner">
         <div class="banner-content">
           <!-- Container with v4.svg as background -->
-          <div class="banner-bg-outer" style="background-image: url('/media/v4.svg');">
+          <div class="banner-bg-outer" style="--banner-bg: url('/media/v4.svg');">
             <!-- Inner image placed inside the v4.svg container -->
             <img src="/media/pic_1_bg_inner.png" alt="Background" class="banner-bg-inner" />
           </div>
@@ -598,55 +598,88 @@ onUnmounted(() => {
   transform: translate(-50%, -50%);
   width: 100%;
   height: 100%;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  transition: transform 0.4s ease, filter 0.4s ease;
+  filter: url(#jellyDistortion);
+  --jelly-border: polygon(0% 2%, 100% 0%, 98% 98%, 2% 100%);
+  clip-path: var(--jelly-border);
+  background-image: var(--banner-bg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding: clamp(24px, 6vw, 72px);
+  will-change: clip-path, transform;
+}
+
+.banner-bg-outer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--banner-bg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  clip-path: var(--jelly-border);
+  filter: url(#jellyDistortion);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
 }
 
 .banner-bg-outer:hover {
-  filter: url(#magneticDistortion);
-  animation: magneticDistortion 0.8s ease-in-out;
-  clip-path: polygon(0% 0%, 100% 0%, 95% 20%, 100% 40%, 90% 60%, 100% 80%, 95% 100%, 0% 100%, 5% 80%, 0% 60%, 10% 40%, 0% 20%);
+  filter: url(#jellyHover);
+  transform: translate(-50%, -50%) scale(1.02) rotate(-1deg);
 }
 
-@keyframes magneticDistortion {
+.banner-bg-outer:hover::before {
+  opacity: 1;
+  animation: jellyContour 1.4s ease-in-out infinite;
+  filter: url(#jellyHover);
+}
+
+@keyframes jellyContour {
   0% {
-    filter: url(#magneticDistortion);
-    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    clip-path: polygon(0% 2%, 100% 0%, 98% 98%, 2% 100%);
+    transform: scale(1);
   }
   25% {
-    filter: url(#magneticDistortion);
-    clip-path: polygon(0% 0%, 100% 0%, 90% 15%, 100% 35%, 85% 55%, 100% 75%, 90% 100%, 0% 100%, 10% 85%, 0% 65%, 15% 45%, 0% 25%);
+    clip-path: polygon(1% 4%, 99% 0%, 97% 96%, 3% 99%);
+    transform: scaleX(1.015) scaleY(0.985) rotate(0.6deg);
   }
   50% {
-    filter: url(#magneticDistortion);
-    clip-path: polygon(0% 0%, 100% 0%, 85% 10%, 100% 30%, 80% 50%, 100% 70%, 85% 100%, 0% 100%, 15% 90%, 0% 70%, 20% 50%, 0% 30%);
+    clip-path: polygon(0% 0%, 100% 3%, 99% 100%, 1% 97%);
+    transform: scaleX(0.99) scaleY(1.01) rotate(-0.8deg);
   }
   75% {
-    filter: url(#magneticDistortion);
-    clip-path: polygon(0% 0%, 100% 0%, 90% 15%, 100% 35%, 85% 55%, 100% 75%, 90% 100%, 0% 100%, 10% 85%, 0% 65%, 15% 45%, 0% 25%);
+    clip-path: polygon(2% 3%, 100% 1%, 97% 97%, 0% 100%);
+    transform: scaleX(1.02) scaleY(0.98) rotate(0.4deg);
   }
   100% {
-    filter: url(#magneticDistortion);
-    clip-path: polygon(0% 0%, 100% 0%, 95% 20%, 100% 40%, 90% 60%, 100% 80%, 95% 100%, 0% 100%, 5% 80%, 0% 60%, 10% 40%, 0% 20%);
+    clip-path: polygon(0% 2%, 100% 0%, 98% 98%, 2% 100%);
+    transform: scale(1);
   }
 }
 
 .banner-bg-inner {
-  max-width: 60%;
-  max-height: 60%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
   margin: auto;
+  transition: transform 0.5s ease, filter 0.5s ease;
+  pointer-events: none;
+}
+
+.banner-bg-outer:hover .banner-bg-inner {
+  transform: scale(1.05) translateY(-3%);
+  filter: drop-shadow(0 18px 35px rgba(255, 107, 107, 0.35));
 }
 
 /* Make sure letters are visible */
