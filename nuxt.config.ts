@@ -1,22 +1,22 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+// nuxt.config.ts
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  compatibilityDate: '2025-10-24',
   css: ['~/assets/css/style.css'],
   modules: ['@pinia/nuxt'],
+  // ❌ УДАЛИ это: 'public/media/plugins/jelly.client.ts'
+  // ✅ Либо вообще убери поле plugins (автоимпорт),
+  //    либо пропиши так:
+  plugins: ['~/plugins/jelly.client.ts'],
+
   nitro: {
     preset: 'netlify-static',
-    prerender: {
-      routes: ['/']
-    }
+    prerender: { routes: ['/'] }
   },
-  ssr: false, // Enable SPA mode for static generation
+  ssr: false,
   vite: {
     css: {
       preprocessorOptions: {
-        css: {
-          additionalData: `@import "~/assets/css/style.css";`
-        }
+        scss: { additionalData: `@import "~/assets/css/style.css";` }
       }
     }
   },
@@ -28,9 +28,7 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'Experience the future of web design with Loopy' }
       ],
-      link: [
-        { rel: 'icon', type: 'image/png', href: '/media/favicon.png' }
-      ],
+      link: [{ rel: 'icon', type: 'image/png', href: '/media/favicon.png' }],
       script: [
         {
           src: 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js',
