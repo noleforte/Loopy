@@ -127,10 +127,10 @@ import { onMounted, onUnmounted } from 'vue'
 const config = useRuntimeConfig()
 const baseURL = config.public.baseURL || ''
 
-const pic1 = `${baseURL}/media/Layers1/pic_1.png`
-const pic2 = `${baseURL}/media/Layers1/pic_2.png`
-const pic3 = `${baseURL}/media/Layers1/pic_3.png`
-const pic4 = `${baseURL}/media/Layers1/pic_4.png`
+const pic1 = `${baseURL}/media/Layers1/pic_1.svg`
+const pic2 = `${baseURL}/media/Layers1/pic_2.svg`
+const pic3 = `${baseURL}/media/Layers1/pic_3.svg`
+const pic4 = `${baseURL}/media/Layers1/pic_4.svg`
 
 // Global head configuration
 useHead({
@@ -140,7 +140,7 @@ useHead({
     { name: 'viewport', content: 'width=device-width, initial-scale=1.0' }
   ],
   link: [
-    { rel: 'icon', type: 'image/png', href: '/media/favicon.png' }
+    { rel: 'icon', type: 'image/svg+xml', href: '/media/favicon.svg' }
   ]
 })
 
