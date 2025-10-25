@@ -124,10 +124,10 @@
 import { onMounted, onUnmounted } from 'vue'
 
 // Image paths - use absolute paths for better compatibility
-const pic1 = 'public/media/Layers1/pic_1.png'
-const pic2 = 'public/media/Layers1/pic_2.png'
-const pic3 = 'public/media/Layers1/pic_3.png'
-const pic4 = 'public/media/Layers1/pic_4.png'
+const pic1 = '/media/pic_1.png'
+const pic2 = '/media/pic_2.png'
+const pic3 = '/media/pic_3.png'
+const pic4 = '/media/pic_4.png'
 
 // Global head configuration
 useHead({
