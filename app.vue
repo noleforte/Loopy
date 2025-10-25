@@ -1,5 +1,26 @@
 <template>
   <div>
+    <!-- SVG Filters for jelly-like distortion -->
+    <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+      <defs>
+        <filter id="jellyDistortion" x="-50%" y="-50%" width="200%" height="200%">
+          <feTurbulence baseFrequency="0.03" numOctaves="4" result="noise" type="fractalNoise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="15" result="displacement"/>
+          <feGaussianBlur in="displacement" stdDeviation="2" result="blur"/>
+          <feColorMatrix type="saturate" values="1.2" in="blur" result="saturated"/>
+          <feComposite in="saturated" in2="SourceGraphic" operator="over"/>
+        </filter>
+        
+        <filter id="jellyHover" x="-100%" y="-100%" width="300%" height="300%">
+          <feTurbulence baseFrequency="0.05" numOctaves="3" result="noise" type="fractalNoise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="25" result="displacement"/>
+          <feGaussianBlur in="displacement" stdDeviation="3" result="blur"/>
+          <feColorMatrix type="saturate" values="1.5" in="blur" result="saturated"/>
+          <feComposite in="saturated" in2="SourceGraphic" operator="over"/>
+        </filter>
+      </defs>
+    </svg>
+
     <!-- Progress Indicator -->
     <div id="progress-indicator">
       <div class="progress-dot active" data-section="0"></div>
@@ -13,25 +34,10 @@
       <!-- Banner Section - Full Screen -->
       <section id="banner" class="banner">
         <div class="banner-content">
-          <h1 class="banner-title animate-title" id="banner-title">
-            <span class="letter-3d">L</span>
-            <span class="letter-3d">o</span>
-            <span class="letter-3d">o</span>
-            <span class="letter-3d">p</span>
-            <span class="letter-3d">y</span>
-          </h1>
-          <p class="banner-subtitle animate-subtitle">Experience the future of web design</p>
-          
-          <!-- Ponpon-style buttons -->
-          <div class="ponpon-buttons">
-            <button class="ponpon-btn btn-primary cta-button" @click="nextSection">
-              <span class="btn-text">Get Started</span>
-              <div class="btn-bg"></div>
-            </button>
-            <button class="ponpon-btn btn-secondary cta-button" @click="playAnimation">
-              <span class="btn-text">Play</span>
-              <div class="btn-bg"></div>
-            </button>
+          <!-- Container with v4.svg as background -->
+          <div class="banner-bg-outer" style="background-image: url('/media/v4.svg');">
+            <!-- Inner image placed inside the v4.svg container -->
+            <img src="/media/pic_1_bg_inner.png" alt="Background" class="banner-bg-inner" />
           </div>
         </div>
       </section>
@@ -577,6 +583,70 @@ onUnmounted(() => {
   text-align: center !important;
   position: relative;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Banner images styling */
+.banner-bg-outer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.banner-bg-outer:hover {
+  filter: url(#magneticDistortion);
+  animation: magneticDistortion 0.8s ease-in-out;
+  clip-path: polygon(0% 0%, 100% 0%, 95% 20%, 100% 40%, 90% 60%, 100% 80%, 95% 100%, 0% 100%, 5% 80%, 0% 60%, 10% 40%, 0% 20%);
+}
+
+@keyframes magneticDistortion {
+  0% {
+    filter: url(#magneticDistortion);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+  25% {
+    filter: url(#magneticDistortion);
+    clip-path: polygon(0% 0%, 100% 0%, 90% 15%, 100% 35%, 85% 55%, 100% 75%, 90% 100%, 0% 100%, 10% 85%, 0% 65%, 15% 45%, 0% 25%);
+  }
+  50% {
+    filter: url(#magneticDistortion);
+    clip-path: polygon(0% 0%, 100% 0%, 85% 10%, 100% 30%, 80% 50%, 100% 70%, 85% 100%, 0% 100%, 15% 90%, 0% 70%, 20% 50%, 0% 30%);
+  }
+  75% {
+    filter: url(#magneticDistortion);
+    clip-path: polygon(0% 0%, 100% 0%, 90% 15%, 100% 35%, 85% 55%, 100% 75%, 90% 100%, 0% 100%, 10% 85%, 0% 65%, 15% 45%, 0% 25%);
+  }
+  100% {
+    filter: url(#magneticDistortion);
+    clip-path: polygon(0% 0%, 100% 0%, 95% 20%, 100% 40%, 90% 60%, 100% 80%, 95% 100%, 0% 100%, 5% 80%, 0% 60%, 10% 40%, 0% 20%);
+  }
+}
+
+.banner-bg-inner {
+  max-width: 60%;
+  max-height: 60%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+  margin: auto;
 }
 
 /* Make sure letters are visible */
