@@ -11,6 +11,15 @@ export default defineNuxtConfig({
     }
   },
   ssr: false, // Enable SPA mode for static generation
+  vite: {
+    css: {
+      preprocessorOptions: {
+        css: {
+          additionalData: `@import "~/assets/css/style.css";`
+        }
+      }
+    }
+  },
   app: {
     head: {
       title: 'Loopy - Experience the future of web design',

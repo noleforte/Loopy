@@ -1,3 +1,17 @@
+/* Import images */
+@import url('~/assets/images/pic_1.png');
+@import url('~/assets/images/pic_2.png');
+@import url('~/assets/images/pic_3.png');
+@import url('~/assets/images/pic_4.png');
+
+/* CSS Variables for assets */
+:root {
+  --pic-1: url('~/assets/images/pic_1.png');
+  --pic-2: url('~/assets/images/pic_2.png');
+  --pic-3: url('~/assets/images/pic_3.png');
+  --pic-4: url('~/assets/images/pic_4.png');
+}
+
 /* Reset and Base Styles */
 * {
     margin: 0;
@@ -32,7 +46,7 @@ body {
 .banner {
     height: 100vh;
     width: 100vw;
-    background: url(/media/Layers1/pic_4.png);
+    background: var(--pic-4);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -86,21 +100,21 @@ body {
 }
 
 .section-1 {
-    background: url(/media/Layers1/pic_3.png);
+    background: var(--pic-3);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
 .section-2 {
-    background: url(/media/Layers1/pic_2.png);
+    background: var(--pic-2);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
 .section-3 {
-    background: url(/media/Layers1/pic_1.png);
+    background: var(--pic-1);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -192,7 +206,7 @@ body {
 .final-section {
     width: 100vw;
     height: 100vh;
-    background: url(/media/Layers1/pic_1.png);
+    background: var(--pic-1);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
