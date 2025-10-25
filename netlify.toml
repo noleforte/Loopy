@@ -3,14 +3,14 @@
   base = "."
   
   # Directory that contains the deploy-ready HTML files and assets
-  publish = "."
+  publish = ".output/public"
   
-  # Default build command
-  command = "echo 'Static site - no build step required'"
+  # Build command for Nuxt static generation
+  command = "npm run generate"
 
 [build.environment]
-  # Node.js version
-  NODE_VERSION = "18"
+  # Node.js version - using 20 for Nuxt 4 compatibility
+  NODE_VERSION = "20"
 
 # Redirect rules for SPA-like behavior
 [[redirects]]

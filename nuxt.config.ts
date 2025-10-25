@@ -4,6 +4,12 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-10-24',
   css: ['~/assets/css/style.css'],
   modules: ['@pinia/nuxt'],
+  nitro: {
+    prerender: {
+      routes: ['/']
+    }
+  },
+  ssr: false, // Enable SPA mode for static generation
   app: {
     head: {
       title: 'Loopy - Experience the future of web design',
