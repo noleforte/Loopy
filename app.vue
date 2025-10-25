@@ -123,6 +123,12 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
 
+// Import images
+import pic1 from '~/public/media/Layers1/pic_1.png'
+import pic2 from '~/public/media/Layers1/pic_2.png'
+import pic3 from '~/public/media/Layers1/pic_3.png'
+import pic4 from '~/public/media/Layers1/pic_4.png'
+
 // Global head configuration
 useHead({
   title: 'Loopy - Experience the future of web design',
@@ -498,6 +504,13 @@ function playAnimation() {
 }
 
 onMounted(() => {
+  // Set CSS variables for images
+  const root = document.documentElement
+  root.style.setProperty('--pic-1', `url(${pic1})`)
+  root.style.setProperty('--pic-2', `url(${pic2})`)
+  root.style.setProperty('--pic-3', `url(${pic3})`)
+  root.style.setProperty('--pic-4', `url(${pic4})`)
+
   // Wait for GSAP to be available
   const initApp = () => {
     if (typeof gsap === 'undefined') {
