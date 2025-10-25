@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/style.css'],
   modules: ['@pinia/nuxt'],
   nitro: {
+    preset: 'netlify-static',
     prerender: {
       routes: ['/']
     }

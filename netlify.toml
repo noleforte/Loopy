@@ -3,7 +3,7 @@
   base = "."
   
   # Directory that contains the deploy-ready HTML files and assets
-  publish = ".output/public"
+  publish = "dist"
   
   # Build command for Nuxt static generation
   command = "npm run generate"
