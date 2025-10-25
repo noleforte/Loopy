@@ -11,6 +11,11 @@ export default defineNuxtConfig({
     }
   },
   ssr: false, // Enable SPA mode for static generation
+  runtimeConfig: {
+    public: {
+      baseURL: process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : ''
+    }
+  },
   vite: {
     css: {
       preprocessorOptions: {

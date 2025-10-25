@@ -123,11 +123,14 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
 
-// Static image paths - no imports needed for public assets
-const pic1 = '/media/Layers1/pic_1.png'
-const pic2 = '/media/Layers1/pic_2.png'
-const pic3 = '/media/Layers1/pic_3.png'
-const pic4 = '/media/Layers1/pic_4.png'
+// Image paths - use runtime config for proper URL resolution
+const config = useRuntimeConfig()
+const baseURL = config.public.baseURL || ''
+
+const pic1 = `${baseURL}/media/Layers1/pic_1.png`
+const pic2 = `${baseURL}/media/Layers1/pic_2.png`
+const pic3 = `${baseURL}/media/Layers1/pic_3.png`
+const pic4 = `${baseURL}/media/Layers1/pic_4.png`
 
 // Global head configuration
 useHead({
